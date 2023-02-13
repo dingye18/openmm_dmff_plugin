@@ -32,27 +32,27 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForce.h"
+#include "DMFFForce.h"
 #include "openmm/internal/ForceImpl.h"
 #include "openmm/Kernel.h"
 #include <utility>
 #include <set>
 #include <string>
 
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
 class System;
 
 /**
- * This is the internal implementation of DeepmdForce.
+ * This is the internal implementation of DMFFForce.
  */
 
-class OPENMM_EXPORT_DMFF DeepmdForceImpl : public OpenMM::ForceImpl {
+class OPENMM_EXPORT_DMFF DMFFForceImpl : public OpenMM::ForceImpl {
 public:
-    DeepmdForceImpl(const DeepmdForce& owner);
-    ~DeepmdForceImpl();
+    DMFFForceImpl(const DMFFForce& owner);
+    ~DMFFForceImpl();
     void initialize(OpenMM::ContextImpl& context);
-    const DeepmdForce& getOwner() const {
+    const DMFFForce& getOwner() const {
         return owner;
     }
     void updateContextState(OpenMM::ContextImpl& context, bool& forcesInvalid) {
@@ -66,10 +66,10 @@ public:
     vector<pair<int, int>> getBondedParticles() const; 
     //void updateParametersInContext(OpenMM::ContextImpl& context);
 private:
-    const DeepmdForce& owner;
+    const DMFFForce& owner;
     OpenMM::Kernel kernel;
 };
 
-} // namespace DeepmdPlugin
+} // namespace DMFFPlugin
 
 #endif /*OPENMM_DMFFFORCEIMPL_H_*/

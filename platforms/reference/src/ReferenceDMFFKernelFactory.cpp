@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                              OpenMMDeepmd                                  *
+ *                              OpenMM                                        *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -29,13 +29,13 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "ReferenceDeepmdKernelFactory.h"
-#include "ReferenceDeepmdKernels.h"
+#include "ReferenceDMFFKernelFactory.h"
+#include "ReferenceDMFFKernels.h"
 #include "openmm/reference/ReferencePlatform.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/OpenMMException.h"
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 
 extern "C" OPENMM_EXPORT void registerPlatforms() {
@@ -45,19 +45,19 @@ extern "C" OPENMM_EXPORT void registerKernelFactories() {
     for (int i = 0; i < Platform::getNumPlatforms(); i++) {
         Platform& platform = Platform::getPlatform(i);
         if (dynamic_cast<ReferencePlatform*>(&platform) != NULL) {
-            ReferenceDeepmdKernelFactory* factory = new ReferenceDeepmdKernelFactory();
-            platform.registerKernelFactory(CalcDeepmdForceKernel::Name(), factory);
+            ReferenceDMFFKernelFactory* factory = new ReferenceDMFFKernelFactory();
+            platform.registerKernelFactory(CalcDMFFForceKernel::Name(), factory);
         }
     }
 }
 
-extern "C" OPENMM_EXPORT void registerDeepmdReferenceKernelFactories() {
+extern "C" OPENMM_EXPORT void registerDMFFReferenceKernelFactories() {
     registerKernelFactories();
 }
 
-KernelImpl* ReferenceDeepmdKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
+KernelImpl* ReferenceDMFFKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
     ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());
-    if (name == CalcDeepmdForceKernel::Name())
-        return new ReferenceCalcDeepmdForceKernel(name, platform);
+    if (name == CalcDMFFForceKernel::Name())
+        return new ReferenceCalcDMFFForceKernel(name, platform);
     throw OpenMMException((std::string("Tried to create kernel with illegal kernel name '")+name+"'").c_str());
 }

@@ -40,7 +40,7 @@ namespace OpenMM {
  * This KernelFactory creates kernels for the reference implementation of the DMFF plugin.
  */
 
-class ReferenceDeepmdKernelFactory : public KernelFactory {
+class ReferenceDMFFKernelFactory : public KernelFactory {
 public:
     KernelImpl* createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const;
 };

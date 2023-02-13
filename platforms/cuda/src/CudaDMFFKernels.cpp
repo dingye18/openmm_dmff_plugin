@@ -29,23 +29,23 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "CudaDeepmdKernels.h"
-#include "CudaDeepmdKernelSources.h"
+#include "CudaDMFFKernels.h"
+#include "CudaDMFFKernelSources.h"
 #include "openmm/internal/ContextImpl.h"
 #include <map>
 #include <algorithm>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 using namespace std;
 
 
-CudaCalcDeepmdForceKernel::~CudaCalcDeepmdForceKernel(){
+CudaCalcDMFFForceKernel::~CudaCalcDMFFForceKernel(){
    return;
 }
 
-void CudaCalcDeepmdForceKernel::initialize(const System& system, const DeepmdForce& force){
-    graph_file = force.getDeepmdGraphFile();
+void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& force){
+    graph_file = force.getDMFFGraphFile();
     type4EachParticle = force.getType4EachParticle();
     typesIndexMap = force.getTypesIndexMap();
     used4Alchemical = force.alchemical();
@@ -132,12 +132,12 @@ void CudaCalcDeepmdForceKernel::initialize(const System& system, const DeepmdFor
         defines["FORCES_TYPE"] = "float";
         networkForces.initialize(cu, 3*natoms, sizeof(float), "networkForces");
     #endif
-    CUmodule module = cu.createModule(CudaDeepmdKernelSources::DeepmdForce, defines);
+    CUmodule module = cu.createModule(CudaDMFFKernelSources::DMFFForce, defines);
     addForcesKernel = cu.getKernel(module, "addForces");
 }
 
 
-double CudaCalcDeepmdForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
+double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
     vector<Vec3> pos;
     context.getPositions(pos);
     Vec3 box[3];

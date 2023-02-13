@@ -29,7 +29,7 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForce.h"
+#include "DMFFForce.h"
 #include "openmm/internal/AssertionUtilities.h"
 #include "openmm/Context.h"
 #include "openmm/System.h"
@@ -41,20 +41,20 @@
 
 
 using namespace OpenMM;
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace std;
 
-extern "C" OPENMM_EXPORT void registerDeepmdReferenceKernelFactories();
+extern "C" OPENMM_EXPORT void registerDMFFReferenceKernelFactories();
 
 const double TOL = 1e-5;
-const string graph = "../tests/frozen_model/water.pb";
+const string graph = "../tests/lj_liquid.pb";
 const double coordUnitCoeff = 10;
 const double forceUnitCoeff = 964.8792534459;
 const double energyUnitCoeff = 96.48792534459;
 const double temperature = 300;
 const int randomSeed = 123456;
 
-void referenceDeepmdForce(vector<Vec3> positions, vector<Vec3> box, vector<int> types, vector<Vec3>& force, double& energy, DeepPot nnp_inter){
+void referenceDMFFForce(vector<Vec3> positions, vector<Vec3> box, vector<int> types, vector<Vec3>& force, double& energy, cppflow::model jax_model){
     
     int natoms = positions.size();
     vector<VALUETYPE> nnp_coords(natoms*3);

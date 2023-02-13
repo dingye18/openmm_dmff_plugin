@@ -29,13 +29,13 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForce.h"
-#include "internal/DeepmdForceImpl.h"
+#include "DMFFForce.h"
+#include "internal/DMFFForceImpl.h"
 #include "openmm/OpenMMException.h"
 #include "openmm/internal/AssertionUtilities.h"
 #include <sys/stat.h>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 using namespace std;
 
@@ -44,7 +44,7 @@ inline bool exists(const std::string& name) {
     return (stat (name.c_str(), &buffer) == 0); 
 }
 
-DeepmdForce::DeepmdForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2){
+DMFFForce::DMFFForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2){
     graph_file  = GraphFile;
     graph_file_1 = GraphFile_1;
     graph_file_2 = GraphFile_2;
@@ -61,60 +61,48 @@ DeepmdForce::DeepmdForce(const string& GraphFile, const string& GraphFile_1, con
     if (!exists(graph_file)){
         throw OpenMMException("Graph file not found: "+graph_file);
     }
-    // Initialize dp model
-    DeepPot tmp_dp = DeepPot(graph_file);
-    
-    // Extract the model informations first.
-    this->numb_types = tmp_dp.numb_types();
-    this->cutoff = tmp_dp.cutoff();
-    tmp_dp.get_type_map(this->type_map);
 }
 
-DeepmdForce::DeepmdForce(const string& GraphFile){
+DMFFForce::DMFFForce(const string& GraphFile){
     graph_file  = GraphFile;
     this->used4Alchemical = false;
     if (!exists(graph_file)){
         throw OpenMMException("Graph file not found: "+graph_file);
     }
-    // Initialize dp model
-    DeepPot tmp_dp = DeepPot(graph_file);
-    this->numb_types = tmp_dp.numb_types();
-    this->cutoff = tmp_dp.cutoff();
-    tmp_dp.get_type_map(this->type_map);
 }
 
-DeepmdForce::~DeepmdForce(){
+DMFFForce::~DMFFForce(){
     type4EachParticle.clear();
     particleGroup4EachType.clear();
     typesIndexMap.clear();
 }
 
 
-void DeepmdForce::setPBC(const bool use_PBC){
+void DMFFForce::setPBC(const bool use_PBC){
     // By default, use_pbc is set to be true.
     use_pbc = use_PBC;
 }
 
-void DeepmdForce::setUnitTransformCoefficients(const double coordCoefficient, const double forceCoefficient, const double energyCoefficient){
+void DMFFForce::setUnitTransformCoefficients(const double coordCoefficient, const double forceCoefficient, const double energyCoefficient){
     coordCoeff = coordCoefficient;
     forceCoeff = forceCoefficient;
     energyCoeff = energyCoefficient;
 }
 
-double DeepmdForce::getCoordUnitCoefficient() const {return coordCoeff;}
-double DeepmdForce::getForceUnitCoefficient() const {return forceCoeff;}
-double DeepmdForce::getEnergyUnitCoefficient() const {return energyCoeff;}
+double DMFFForce::getCoordUnitCoefficient() const {return coordCoeff;}
+double DMFFForce::getForceUnitCoefficient() const {return forceCoeff;}
+double DMFFForce::getEnergyUnitCoefficient() const {return energyCoeff;}
 
-double DeepmdForce::getCutoff() const {return cutoff;}
-int DeepmdForce::getNumberTypes() const {return numb_types;}
-string DeepmdForce::getTypesMap() const {return type_map;}
+double DMFFForce::getCutoff() const {return cutoff;}
+int DMFFForce::getNumberTypes() const {return numb_types;}
+string DMFFForce::getTypesMap() const {return type_map;}
 
-const string& DeepmdForce::getDeepmdGraphFile() const{return graph_file;}
-const map<int, string>& DeepmdForce::getType4EachParticle() const{return type4EachParticle;}
-const map<string, vector<int>>& DeepmdForce::getParticles4EachType() const{return particleGroup4EachType;}
-const map<string, int>& DeepmdForce::getTypesIndexMap() const{return typesIndexMap;}
+const string& DMFFForce::getDMFFGraphFile() const{return graph_file;}
+const map<int, string>& DMFFForce::getType4EachParticle() const{return type4EachParticle;}
+const map<string, vector<int>>& DMFFForce::getParticles4EachType() const{return particleGroup4EachType;}
+const map<string, int>& DMFFForce::getTypesIndexMap() const{return typesIndexMap;}
 
-void DeepmdForce::addParticle(const int particleIndex, const string particleType){
+void DMFFForce::addParticle(const int particleIndex, const string particleType){
     auto insertResult = type4EachParticle.insert(pair<int, string>(particleIndex, particleType));
     if(insertResult.second == false){
         throw OpenMMException("Failed to add in particle, duplicate key.");
@@ -128,7 +116,7 @@ void DeepmdForce::addParticle(const int particleIndex, const string particleType
     }
 }
 
-void DeepmdForce::addType(const int typeIndex, const string Type){
+void DMFFForce::addType(const int typeIndex, const string Type){
     auto it = typesIndexMap.find(Type);
     if(it == typesIndexMap.end()){
         typesIndexMap[Type] = typeIndex;
@@ -139,63 +127,63 @@ void DeepmdForce::addType(const int typeIndex, const string Type){
     }
 }
 
-void DeepmdForce::addBond(const int particle1, const int particle2){
+void DMFFForce::addBond(const int particle1, const int particle2){
     bondsList.push_back(make_pair(particle1, particle2));
 }
 
-const vector<pair<int, int>> DeepmdForce::getBondsList() const{
+const vector<pair<int, int>> DMFFForce::getBondsList() const{
     return bondsList;
 }
 
 
-ForceImpl* DeepmdForce::createImpl() const {
-    return new DeepmdForceImpl(*this);
+ForceImpl* DMFFForce::createImpl() const {
+    return new DMFFForceImpl(*this);
 }
 
-void DeepmdForce::updateParametersInContext(Context& context) {
+void DMFFForce::updateParametersInContext(Context& context) {
     // Nothing to be done here.
     return;
 }
 
-void DeepmdForce::setAlchemical(const bool used4Alchemical){
+void DMFFForce::setAlchemical(const bool used4Alchemical){
     this->used4Alchemical = used4Alchemical;
 }
 
-void DeepmdForce::setAtomsIndex4Graph1(const vector<int> atomsIndex){
+void DMFFForce::setAtomsIndex4Graph1(const vector<int> atomsIndex){
     atomsIndex4Graph1.clear();
     for(auto it = atomsIndex.begin(); it != atomsIndex.end();it++){
         atomsIndex4Graph1.push_back(*it);
     }
 }
 
-void DeepmdForce::setAtomsIndex4Graph2(const vector<int> atomsIndex){
+void DMFFForce::setAtomsIndex4Graph2(const vector<int> atomsIndex){
     atomsIndex4Graph2.clear();
     for(auto it = atomsIndex.begin(); it != atomsIndex.end();it++){
         atomsIndex4Graph2.push_back(*it);
     }
 }
 
-void DeepmdForce::setLambda(const double lambda){
+void DMFFForce::setLambda(const double lambda){
     this->lambda = lambda;
 }
 
-double DeepmdForce::getLambda() const {return lambda;}
+double DMFFForce::getLambda() const {return lambda;}
 
-vector<int> DeepmdForce::getAtomsIndex4Graph1() const {return atomsIndex4Graph1;}
-vector<int> DeepmdForce::getAtomsIndex4Graph2() const {return atomsIndex4Graph2;}
+vector<int> DMFFForce::getAtomsIndex4Graph1() const {return atomsIndex4Graph1;}
+vector<int> DMFFForce::getAtomsIndex4Graph2() const {return atomsIndex4Graph2;}
 
-const string DeepmdForce::getGraph1_4Alchemical() const {
+const string DMFFForce::getGraph1_4Alchemical() const {
     if(used4Alchemical)
     return graph_file_1;
     else{
-        throw OpenMMException("This Deepmd Force is not used for alchemical simulation.");
+        throw OpenMMException("This DMFF Force is not used for alchemical simulation.");
     }
 }
 
-const string DeepmdForce::getGraph2_4Alchemical() const {
+const string DMFFForce::getGraph2_4Alchemical() const {
     if(used4Alchemical)
     return graph_file_2;
     else{
-        throw OpenMMException("This Deepmd Force is not used for alchemical simulation.");
+        throw OpenMMException("This DMFF Force is not used for alchemical simulation.");
     }
 }

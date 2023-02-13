@@ -32,31 +32,31 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForce.h"
+#include "DMFFForce.h"
 #include "openmm/KernelImpl.h"
 #include "openmm/Platform.h"
 #include "openmm/System.h"
 #include <string>
 
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
 /**
- * This kernel is invoked by DeepmdForce to calculate the forces acting on the system and the energy of the system.
+ * This kernel is invoked by DMFFForce to calculate the forces acting on the system and the energy of the system.
  */
-class CalcDeepmdForceKernel : public OpenMM::KernelImpl {
+class CalcDMFFForceKernel : public OpenMM::KernelImpl {
 public:
     static std::string Name() {
-        return "CalcDeepmdForce";
+        return "CalcDMFFForce";
     }
-    CalcDeepmdForceKernel(std::string name, const OpenMM::Platform& platform) : OpenMM::KernelImpl(name, platform) {
+    CalcDMFFForceKernel(std::string name, const OpenMM::Platform& platform) : OpenMM::KernelImpl(name, platform) {
     }
     /**
      * Initialize the kernel.
      * 
      * @param system     the System this kernel will be applied to
-     * @param force      the DeepmdForce this kernel will be used for
+     * @param force      the DMFFForce this kernel will be used for
      */
-    virtual void initialize(const OpenMM::System& system, const DeepmdForce& force) = 0;
+    virtual void initialize(const OpenMM::System& system, const DMFFForce& force) = 0;
     /**
      * Execute the kernel to calculate the forces and/or energy.
      *
@@ -69,6 +69,6 @@ public:
     
 };
 
-} // namespace DeepmdPlugin
+} // namespace DMFFPlugin
 
 #endif /*DMFF_KERNELS_H_*/

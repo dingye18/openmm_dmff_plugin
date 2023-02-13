@@ -32,21 +32,21 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdKernels.h"
+#include "DMFFKernels.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
 
 
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
 /**
- * This kernel is invoked by DeepmdForceImpl to calculate the forces acting on the system and the energy of the system.
+ * This kernel is invoked by DMFFForceImpl to calculate the forces acting on the system and the energy of the system.
  */
-class CudaCalcDeepmdForceKernel : public CalcDeepmdForceKernel{
+class CudaCalcDMFFForceKernel : public CalcDMFFForceKernel{
 public:
-    CudaCalcDeepmdForceKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu):CalcDeepmdForceKernel(name, platform), cu(cu){};
-    ~CudaCalcDeepmdForceKernel();
-    void initialize(const OpenMM::System& system, const DeepmdForce& force);
+    CudaCalcDMFFForceKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu):CalcDMFFForceKernel(name, platform), cu(cu){};
+    ~CudaCalcDMFFForceKernel();
+    void initialize(const OpenMM::System& system, const DMFFForce& force);
     double execute(OpenMM::ContextImpl& context, bool includeForces, bool includeEnergy);
 private:
     // Used for CUDA Platform.
@@ -94,7 +94,7 @@ private:
 };
 
 
-} // namespace DeepmdPlugin
+} // namespace DMFFPlugin
 
 
 #endif /*CUDA_DMFF_KERNELS_H_*/

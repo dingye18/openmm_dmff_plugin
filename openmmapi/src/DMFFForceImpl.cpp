@@ -32,8 +32,8 @@
 #ifdef WIN32
   #define _USE_MATH_DEFINES // Needed to get M_PI
 #endif
-#include "internal/DeepmdForceImpl.h"
-#include "DeepmdKernels.h"
+#include "internal/DMFFForceImpl.h"
+#include "DMFFKernels.h"
 #include "openmm/OpenMMException.h"
 #include "openmm/internal/ContextImpl.h"
 #include <cmath>
@@ -41,34 +41,34 @@
 #include <set>
 #include <sstream>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 using namespace std;
 
-DeepmdForceImpl::DeepmdForceImpl(const DeepmdForce& owner) : owner(owner) {
+DMFFForceImpl::DMFFForceImpl(const DMFFForce& owner) : owner(owner) {
 }
 
-DeepmdForceImpl::~DeepmdForceImpl() {
+DMFFForceImpl::~DMFFForceImpl() {
 }
 
-void DeepmdForceImpl::initialize(ContextImpl& context) {
-    kernel = context.getPlatform().createKernel(CalcDeepmdForceKernel::Name(), context);
-    kernel.getAs<CalcDeepmdForceKernel>().initialize(context.getSystem(), owner);
+void DMFFForceImpl::initialize(ContextImpl& context) {
+    kernel = context.getPlatform().createKernel(CalcDMFFForceKernel::Name(), context);
+    kernel.getAs<CalcDMFFForceKernel>().initialize(context.getSystem(), owner);
 }
 
-double DeepmdForceImpl::calcForcesAndEnergy(ContextImpl& context, bool includeForces, bool includeEnergy, int groups) {
+double DMFFForceImpl::calcForcesAndEnergy(ContextImpl& context, bool includeForces, bool includeEnergy, int groups) {
     if ((groups&(1<<owner.getForceGroup())) != 0)
-        return kernel.getAs<CalcDeepmdForceKernel>().execute(context, includeForces, includeEnergy);
+        return kernel.getAs<CalcDMFFForceKernel>().execute(context, includeForces, includeEnergy);
     return 0.0;
 }
 
-vector<pair<int, int>> DeepmdForceImpl::getBondedParticles() const{
+vector<pair<int, int>> DMFFForceImpl::getBondedParticles() const{
     return owner.getBondsList();
 }
 
-std::vector<std::string> DeepmdForceImpl::getKernelNames() {
+std::vector<std::string> DMFFForceImpl::getKernelNames() {
     std::vector<std::string> names;
-    names.push_back(CalcDeepmdForceKernel::Name());
+    names.push_back(CalcDMFFForceKernel::Name());
     return names;
 }
 

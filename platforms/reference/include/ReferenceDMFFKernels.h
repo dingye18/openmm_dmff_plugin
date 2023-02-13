@@ -32,28 +32,29 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdKernels.h"
+#include "DMFFKernels.h"
 #include "openmm/Platform.h"
+#include "ReferenceNeighborList.h"
 #include <vector>
 
 
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
 /**
- * This kernel is invoked by DeepmdForceImpl to calculate the forces acting on the system and the energy of the system.
+ * This kernel is invoked by DMFFForceImpl to calculate the forces acting on the system and the energy of the system.
  */
-class ReferenceCalcDeepmdForceKernel : public CalcDeepmdForceKernel {
+class ReferenceCalcDMFFForceKernel : public CalcDMFFForceKernel {
 public:
-    ReferenceCalcDeepmdForceKernel(std::string name, const OpenMM::Platform& platform) : CalcDeepmdForceKernel(name, platform) {
+    ReferenceCalcDMFFForceKernel(std::string name, const OpenMM::Platform& platform) : CalcDMFFForceKernel(name, platform) {
     }
     /**
      * Initialize the kernel.
      * 
      * @param system     the System this kernel will be applied to
-     * @param force      the DeepmdForce this kernel will be used for
+     * @param force      the DMFFForce this kernel will be used for
      */
-    ~ReferenceCalcDeepmdForceKernel();
-    void initialize(const OpenMM::System& system, const DeepmdForce& force);
+    ~ReferenceCalcDMFFForceKernel();
+    void initialize(const OpenMM::System& system, const DMFFForce& force);
     /**
      * Execute the kernel to calculate the forces and/or energy.
      *
@@ -67,13 +68,21 @@ public:
      * Copy changed parameters over to a context.
      *
      * @param context    the context to copy parameters to
-     * @param force      the DeepmdForce to copy the parameters from
+     * @param force      the DMFFForce to copy the parameters from
      */
 private:
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;
-    // dp_1 and dp_2 are used for alchemical simulation.
-    DeepPot dp, dp_1, dp_2;
+    // jax_m2 and jax_m3 are used for alchemical simulation.
+    cppflow::model jax_model, jax_m1, jax_m2;
+    std::vector<int64_t> coord_shape(2), coord_shape_1(2), coord_shape_2(2);
+    std::vector<int64_t> box_shape(2);
+    std::vector<int64_t> pair_shape(2);
+    box_shape[0] = 3;
+    box_shape[1] = 3;
+
+    NeighborList neighborList;
+    std::vector<std::set<int>> exclusions;
 
     int natoms;
     ENERGYTYPE dener;
@@ -87,11 +96,7 @@ private:
     map<string, vector<int>> particleGroup4EachType;
     map<string, int> typesIndexMap;
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
-    #ifdef HIGH_PREC
     vector<double> AddedForces;
-    #else
-    vector<float> AddedForces;
-    #endif
 
     // Parameters for alchemical simulation.
     bool used4Alchemical = false;
@@ -110,6 +115,6 @@ private:
     vector<pair<int, int>> atomsIndexMap4U_B;
 };
 
-} // namespace DeepmdPlugin
+} // namespace DMFFPlugin
 
 #endif /*REFERENCE_DMFF_KERNELS_H_*/
