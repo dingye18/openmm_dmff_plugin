@@ -157,7 +157,7 @@ class DMFFModel():
             self.dmff_force.addParticle(atom.index, atom_type)
             
         
-        # Add bond information into DeepmdForce for the PBC issue 
+        # Add bond information into DMFFForce for the PBC issue 
         # during the trajectory saving. 
         for bond in topology.bonds():
             self.dmff_force.addBond(bond[0].index, bond[1].index)

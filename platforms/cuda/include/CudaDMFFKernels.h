@@ -35,7 +35,7 @@
 #include "DMFFKernels.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
-#include "ReferenceNeighborList.h"
+#include "openmm/reference/ReferenceNeighborList.h"
 
 
 namespace DMFFPlugin {
@@ -60,13 +60,11 @@ private:
     std::string graph_file, graph_file_1, graph_file_2;
     // jax_m1 and jax_m2 are used for alchemical simulation. Not supported yet.
     cppflow::model jax_model, jax_m1, jax_m2;
-    vector<int64_t> coord_shape(2);
-    vector<int64_t> box_shape(2);
-    vector<int64_t> pair_shape(2);
-    box_shape[0] = 3;
-    box_shape[1] = 3;
-
-    NeighborList neighborList;
+    vector<int64_t> coord_shape = vector<int64_t>(2);
+    vector<int64_t> box_shape{3, 3};
+    vector<int64_t> pair_shape = vector<int64_t>(2);
+    
+    OpenMM::NeighborList neighborList;
     vector<std::set<int>> exclusions;
     
     int natoms;

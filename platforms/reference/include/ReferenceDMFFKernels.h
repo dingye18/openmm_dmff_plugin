@@ -34,9 +34,9 @@
 
 #include "DMFFKernels.h"
 #include "openmm/Platform.h"
-#include "ReferenceNeighborList.h"
+#include "openmm/reference/ReferenceNeighborList.h"
 #include <vector>
-
+#include <stdlib.h>
 
 namespace DMFFPlugin {
 
@@ -75,13 +75,15 @@ private:
     std::string graph_file, graph_file_1, graph_file_2;
     // jax_m2 and jax_m3 are used for alchemical simulation.
     cppflow::model jax_model, jax_m1, jax_m2;
-    std::vector<int64_t> coord_shape(2), coord_shape_1(2), coord_shape_2(2);
-    std::vector<int64_t> box_shape(2);
-    std::vector<int64_t> pair_shape(2);
-    box_shape[0] = 3;
-    box_shape[1] = 3;
+    std::vector<int64_t> coord_shape = vector<int64_t>(2); 
+    std::vector<int64_t> coord_shape_1 = vector<int64_t>(2); 
+    std::vector<int64_t> coord_shape_2 = vector<int64_t>(2);
+    std::vector<int64_t> box_shape{3, 3};
+    std::vector<int64_t> pair_shape = vector<int64_t>(2);
+    //box_shape[0] = 3;
+    //box_shape[1] = 3;
 
-    NeighborList neighborList;
+    OpenMM::NeighborList neighborList;
     std::vector<std::set<int>> exclusions;
 
     int natoms;

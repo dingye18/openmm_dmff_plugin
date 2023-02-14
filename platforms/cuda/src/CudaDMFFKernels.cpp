@@ -80,7 +80,7 @@ void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& 
     cu.setAsCurrent();
     map<string, string> defines;
     defines["FORCES_TYPE"] = "double";
-    dmffForces.initialize(cu, 3*natoms, sizeof(double), "networkForces");
+    dmffForces.initialize(cu, 3*natoms, sizeof(double), "dmffForces");
     CUmodule module = cu.createModule(CudaDMFFKernelSources::DMFFForce, defines);
     addForcesKernel = cu.getKernel(module, "addForces");
 }
@@ -92,24 +92,24 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
     Vec3 box[3];
 
     // Set box size.
-    if (context.getSystem().usesPeriodicBoundaryConditions()){
-        cu.getPeriodicBoxVectors(box[0], box[1], box[2]);
-        // Transform unit from nanometers to angstrom.
-        dbox[0] = box[0][0] * coordUnitCoeff;
-        dbox[1] = box[0][1] * coordUnitCoeff;
-        dbox[2] = box[0][2] * coordUnitCoeff;
-        dbox[3] = box[1][0] * coordUnitCoeff;
-        dbox[4] = box[1][1] * coordUnitCoeff;
-        dbox[5] = box[1][2] * coordUnitCoeff;
-        dbox[6] = box[2][0] * coordUnitCoeff;
-        dbox[7] = box[2][1] * coordUnitCoeff;
-        dbox[8] = box[2][2] * coordUnitCoeff;
-        auto dbox_tensor = cppflow::tensor(dbox, box_shape);
-    }else{
+    if ( !context.getSystem().usesPeriodicBoundaryConditions() ){
         dbox = {}; // No PBC.
         throw OpenMMException("DMFFForce requires periodic boundary conditions.");
     }
     
+    cu.getPeriodicBoxVectors(box[0], box[1], box[2]);
+    // Transform unit from nanometers to the required units in DMFF input.
+    dbox[0] = box[0][0] * coordUnitCoeff;
+    dbox[1] = box[0][1] * coordUnitCoeff;
+    dbox[2] = box[0][2] * coordUnitCoeff;
+    dbox[3] = box[1][0] * coordUnitCoeff;
+    dbox[4] = box[1][1] * coordUnitCoeff;
+    dbox[5] = box[1][2] * coordUnitCoeff;
+    dbox[6] = box[2][0] * coordUnitCoeff;
+    dbox[7] = box[2][1] * coordUnitCoeff;
+    dbox[8] = box[2][2] * coordUnitCoeff;
+    auto dbox_tensor = cppflow::tensor(dbox, box_shape);
+
     // Set input coord.
     for(int ii = 0; ii < natoms; ++ii){
         // Multiply by coordUnitCoeff to transform unit from nanometers to input units for DMFF model.
@@ -138,10 +138,10 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
     }
     pair_shape[0] = totpairs;
     pair_shape[1] = 2;
-    auto dpairs_tensor = cppflow::tensor(pairs_v, pair_shape);
+    auto pair_tensor = cppflow::tensor(pairs_v, pair_shape);
 
     // Calculate the energy and forces.
-    auto output = jax_model({{"serving_default_args_tf_0:0", dcoord_tensor}, {"serving_default_args_tf_1:0", dbox_tensor}, {"serving_default_args_tf_2:0", pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"})
+    auto output = jax_model({{"serving_default_args_tf_0:0", dcoord_tensor}, {"serving_default_args_tf_1:0", dbox_tensor}, {"serving_default_args_tf_2:0", pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
     
     dener = output[0].get_data<ENERGYTYPE>()[0];
     dforce = output[1].get_data<VALUETYPE>();    
@@ -159,9 +159,9 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
     if (includeForces) {
         // Change to OpenMM CUDA context.
         cu.setAsCurrent();
-        networkForces.upload(AddedForces);
+        dmffForces.upload(AddedForces);
         int paddedNumAtoms = cu.getPaddedNumAtoms();
-        void* args[] = {&networkForces.getDevicePointer(), &cu.getForce().getDevicePointer(), &cu.getAtomIndexArray().getDevicePointer(), &natoms, &paddedNumAtoms};
+        void* args[] = {&dmffForces.getDevicePointer(), &cu.getForce().getDevicePointer(), &cu.getAtomIndexArray().getDevicePointer(), &natoms, &paddedNumAtoms};
         cu.executeKernel(addForcesKernel, args, natoms);
     }
     if (!includeEnergy){

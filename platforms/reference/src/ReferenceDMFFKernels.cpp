@@ -82,8 +82,8 @@ void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFFo
         cout<<"Used for alchemical simulation. Load the other two graphs here."<<endl;
         graph_file_1 = force.getGraph1_4Alchemical();
         graph_file_2 = force.getGraph2_4Alchemical();
-        dp_1 = cppflow::model(graph_file_1);
-        dp_2 = cppflow::model(graph_file_2);
+        jax_m1 = cppflow::model(graph_file_1);
+        jax_m2 = cppflow::model(graph_file_2);
         lambda = force.getLambda();
         atomsIndex4Graph1 = force.getAtomsIndex4Graph1();
         atomsIndex4Graph2 = force.getAtomsIndex4Graph2();
@@ -152,25 +152,23 @@ void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFFo
 double ReferenceCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
     vector<RealVec>& pos = extractPositions(context);
     vector<RealVec>& force = extractForces(context);
-
-    // Set box size.
-    if (context.getSystem().usesPeriodicBoundaryConditions()){
-        Vec3* box = extractBoxVectors(context);
-        // Transform unit from nanometers to angstrom.
-        dbox[0] = box[0][0] * coordUnitCoeff;
-        dbox[1] = box[0][1] * coordUnitCoeff;
-        dbox[2] = box[0][2] * coordUnitCoeff;
-        dbox[3] = box[1][0] * coordUnitCoeff;
-        dbox[4] = box[1][1] * coordUnitCoeff;
-        dbox[5] = box[1][2] * coordUnitCoeff;
-        dbox[6] = box[2][0] * coordUnitCoeff;
-        dbox[7] = box[2][1] * coordUnitCoeff;
-        dbox[8] = box[2][2] * coordUnitCoeff;
-        auto dbox_tensor = cppflow::tensor(dbox, box_shape);
-    }else{
+    // Extract the box size.
+    if ( ! context.getSystem().usesPeriodicBoundaryConditions()){
         dbox = {}; // No PBC.
         throw OpenMMException("No PBC is not supported yet.");
     }
+    Vec3* box = extractBoxVectors(context);
+    // Transform unit from nanometers to required units for DMFF model input.
+    dbox[0] = box[0][0] * coordUnitCoeff;
+    dbox[1] = box[0][1] * coordUnitCoeff;
+    dbox[2] = box[0][2] * coordUnitCoeff;
+    dbox[3] = box[1][0] * coordUnitCoeff;
+    dbox[4] = box[1][1] * coordUnitCoeff;
+    dbox[5] = box[1][2] * coordUnitCoeff;
+    dbox[6] = box[2][0] * coordUnitCoeff;
+    dbox[7] = box[2][1] * coordUnitCoeff;
+    dbox[8] = box[2][2] * coordUnitCoeff;
+    auto dbox_tensor = cppflow::tensor(dbox, box_shape);
     
     // Set input coord.
     for(int ii = 0; ii < natoms; ++ii){

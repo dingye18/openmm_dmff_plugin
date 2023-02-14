@@ -43,8 +43,8 @@
 
 using namespace std;
 
-typedef VALUETYPE double
-typedef ENERGYTYPE double
+typedef double VALUETYPE;
+typedef double ENERGYTYPE;
 
 namespace DMFFPlugin {
 
@@ -155,7 +155,7 @@ public:
      * 
      * @return double
      */
-    //double getCutoff() const;
+    double getCutoff() const;
     /**
      * @brief Get the number of types in the model.
      * 
@@ -248,7 +248,7 @@ private:
 
     int numb_types;
     string type_map;
-    double cutoff;
+    double cutoff = 1.2;
     
     map<int, string> type4EachParticle;
     map<string, vector<int>> particleGroup4EachType;

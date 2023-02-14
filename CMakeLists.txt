@@ -12,10 +12,6 @@ SET(OPENMM_DIR "/usr/local/openmm" CACHE PATH "Where OpenMM is installed")
 INCLUDE_DIRECTORIES("${OPENMM_DIR}/include")
 LINK_DIRECTORIES("${OPENMM_DIR}/lib" "${OPENMM_DIR}/lib/plugins")
 
-# Include the dmff.
-#SET(DMFF_DIR "/usr/local/dmff/" CACHE PATH "Where libdmff_c is installed")
-#INCLUDE_DIRECTORIES("${DMFF_DIR}/include")
-#LINK_DIRECTORIES("${DMFF_DIR}/lib")
 
 # Include the cppflow
 SET(CPPFLOW_DIR "/usr/local/cppflow/" CACHE PATH "Where cppflow is installed")
@@ -28,7 +24,7 @@ INCLUDE_DIRECTORIES("${TENSORFLOW_DIR}/include")
 LINK_DIRECTORIES("${TENSORFLOW_DIR}/lib")
 
 # Specify the C++ version we are building for.
-SET (CMAKE_CXX_STANDARD 11)
+SET (CMAKE_CXX_STANDARD 17)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-attributes -Wl,--allow-multiple-definition  -Wl,--no-as-needed")
 

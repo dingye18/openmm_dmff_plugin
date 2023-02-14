@@ -4,14 +4,15 @@ import os
 import platform
 
 openmm_dir = '@OPENMM_DIR@'
-dmff_dir = '@DMFF_DIR@'
-DeepmdPlugin_header_dir = '@DMFFPLUGIN_HEADER_DIR@'
-DeepmdPlugin_library_dir = '@DMFFPLUGIN_LIBRARY_DIR@'
+CPPFLOW_DIR = '@CPPFLOW_DIR@'
+TENSORFLOW_DIR = '@TENSORFLOW_DIR@'
+DMFFPlugin_header_dir = '@DMFFPLUGIN_HEADER_DIR@'
+DMFFPlugin_library_dir = '@DMFFPLUGIN_LIBRARY_DIR@'
 
 os.environ["CC"] = "@CMAKE_C_COMPILER@"
 os.environ["CXX"] = "@CMAKE_CXX_COMPILER@"
 
-extra_compile_args = []
+extra_compile_args = ["-std=c++17", "-fPIC"]
 extra_link_args = []
 
 
@@ -20,20 +21,20 @@ if platform.system() == 'Darwin':
     extra_compile_args += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
     extra_link_args += ['-stdlib=libc++', '-mmacosx-version-min=10.7', '-Wl', '-rpath', openmm_dir+'/lib']
 
-extension = Extension(name='OpenMMDeepmdPlugin._OpenMMDeepmdPlugin',
-                      sources=['OpenMMDeepmdPluginWrapper.cpp'],
-                      libraries=['OpenMM', 'OpenMMDeepmd'],
-                      include_dirs=[os.path.join(openmm_dir, 'include'), os.path.join(dmff_dir, 'include'), DeepmdPlugin_header_dir],
-                      library_dirs=[os.path.join(openmm_dir, 'lib'), os.path.join(dmff_dir, 'lib'), DeepmdPlugin_library_dir],
+extension = Extension(name='OpenMMDMFFPlugin._OpenMMDMFFPlugin',
+                      sources=['OpenMMDMFFPluginWrapper.cpp'],
+                      libraries=['OpenMM', 'OpenMMDMFF'],
+                      include_dirs=[os.path.join(openmm_dir, 'include'), os.path.join(CPPFLOW_DIR, 'include'), os.path.join(TENSORFLOW_DIR, 'include'), DMFFPlugin_header_dir],
+                      library_dirs=[os.path.join(openmm_dir, 'lib'), os.path.join(CPPFLOW_DIR, 'lib'), os.path.join(TENSORFLOW_DIR, 'lib'), DMFFPlugin_library_dir],
                       extra_compile_args=extra_compile_args,
                       extra_link_args=extra_link_args
                      )
 
 
 
-setup(name='OpenMMDeepmdPlugin',
+setup(name='OpenMMDMFFPlugin',
       version="@GIT_HASH@",
       ext_modules=[extension],
-      packages=['OpenMMDeepmdPlugin', "OpenMMDeepmdPlugin.tests"],
-      package_data={"OpenMMDeepmdPlugin":['data/*.pb', 'data/*.pdb']},
+      packages=['OpenMMDMFFPlugin', "OpenMMDMFFPlugin.tests"],
+      package_data={"OpenMMDMFFPlugin":['data/*.pb', 'data/*.pdb']},
      )

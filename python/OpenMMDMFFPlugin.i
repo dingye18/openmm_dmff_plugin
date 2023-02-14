@@ -1,4 +1,4 @@
-%module OpenMMDeepmdPlugin
+%module OpenMMDMFFPlugin
 
 %import(module="openmm") "swig/OpenMMSwigHeaders.i"
 %include "swig/typemaps.i"
