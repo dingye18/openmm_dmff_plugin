@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                OpenMM-Deepmd                                *
+ *                                OpenMM                                      *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -29,29 +29,31 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForceProxy.h"
-#include "DeepmdForce.h"
+#include "DMFFForceProxy.h"
+#include "DMFFForce.h"
 #include "openmm/serialization/SerializationNode.h"
 #include <string>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 using namespace std;
 
-DeepmdForceProxy::DeepmdForceProxy() : SerializationProxy("DeepmdForce") {
+// TODO: Serialization of DMFFForce is not implemented rigourously. 
+// More work is needed to make sure that the serialization is correct.
+DMFFForceProxy::DMFFForceProxy() : SerializationProxy("DMFFForce") {
 }
 
-void DeepmdForceProxy::serialize(const void* object, SerializationNode& node) const {
-    node.setIntProperty("version", 1);
-    const DeepmdForce& force = *reinterpret_cast<const DeepmdForce*>(object);
-    node.setStringProperty("file", force.getDeepmdGraphFile());
+void DMFFForceProxy::serialize(const void* object, SerializationNode& node) const {
+    node.setIntProperty("version", 0.1);
+    const DMFFForce& force = *reinterpret_cast<const DMFFForce*>(object);
+    node.setStringProperty("file", force.getDMFFGraphFile());
     node.setStringProperty("file1", force.getGraph1_4Alchemical());
     node.setStringProperty("file2", force.getGraph2_4Alchemical());
 }
 
-void* DeepmdForceProxy::deserialize(const SerializationNode& node) const {
-    if (node.getIntProperty("version") != 1)
+void* DMFFForceProxy::deserialize(const SerializationNode& node) const {
+    if (node.getIntProperty("version") != 0.1)
         throw OpenMMException("Unsupported version number");
-    DeepmdForce* force = new DeepmdForce(node.getStringProperty("file"), node.getStringProperty("file1"), node.getStringProperty("file2"));
+    DMFFForce* force = new DMFFForce(node.getStringProperty("file"), node.getStringProperty("file1"), node.getStringProperty("file2"));
     return force;
 }

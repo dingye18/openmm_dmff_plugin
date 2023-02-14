@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                OpenMM-Deepmd                               *
+ *                                OpenMM                                      *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -38,25 +38,25 @@
 #include <cstdlib>
 #endif
 
-#include "DeepmdForce.h"
-#include "DeepmdForceProxy.h"
+#include "DMFFForce.h"
+#include "DMFFForceProxy.h"
 #include "openmm/serialization/SerializationProxy.h"
 
 #if defined(WIN32)
     #include <windows.h>
-    extern "C" OPENMM_EXPORT_DMFF void registerDeepmdSerializationProxies();
+    extern "C" OPENMM_EXPORT_DMFF void registerDMFFSerializationProxies();
     BOOL WINAPI DllMain(HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
         if (ul_reason_for_call == DLL_PROCESS_ATTACH)
-            registerDeepmdSerializationProxies();
+            registerDMFFSerializationProxies();
         return TRUE;
     }
 #else
-    extern "C" void __attribute__((constructor)) registerDeepmdSerializationProxies();
+    extern "C" void __attribute__((constructor)) registerDMFFSerializationProxies();
 #endif
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 
-extern "C" OPENMM_EXPORT_DMFF void registerDeepmdSerializationProxies() {
-    SerializationProxy::registerProxy(typeid(DeepmdForce), new DeepmdForceProxy());
+extern "C" OPENMM_EXPORT_DMFF void registerDMFFSerializationProxies() {
+    SerializationProxy::registerProxy(typeid(DMFFForce), new DMFFForceProxy());
 }

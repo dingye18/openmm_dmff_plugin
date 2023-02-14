@@ -31,14 +31,14 @@
 
 #include <exception>
 
-#include "CudaDeepmdKernelFactory.h"
-#include "CudaDeepmdKernels.h"
+#include "CudaDMFFKernelFactory.h"
+#include "CudaDMFFKernels.h"
 #include "openmm/internal/windowsExport.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/OpenMMException.h"
 #include <vector>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
 using namespace std;
 
@@ -50,15 +50,15 @@ extern "C" OPENMM_EXPORT void registerKernelFactories() {
         int argc = 0;
         vector<char**> argv = {NULL};
         Platform& platform = Platform::getPlatformByName("CUDA");
-        CudaDeepmdKernelFactory* factory = new CudaDeepmdKernelFactory();
-        platform.registerKernelFactory(CalcDeepmdForceKernel::Name(), factory);
+        CudaDMFFKernelFactory* factory = new CudaDMFFKernelFactory();
+        platform.registerKernelFactory(CalcDMFFForceKernel::Name(), factory);
     }
     catch (std::exception ex) {
         // Ignore
     }
 }
 
-extern "C" OPENMM_EXPORT void registerDeepmdCudaKernelFactories() {
+extern "C" OPENMM_EXPORT void registerDMFFCudaKernelFactories() {
     try {
         Platform::getPlatformByName("CUDA");
     }
@@ -68,9 +68,9 @@ extern "C" OPENMM_EXPORT void registerDeepmdCudaKernelFactories() {
     registerKernelFactories();
 }
 
-KernelImpl* CudaDeepmdKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
+KernelImpl* CudaDMFFKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
     CudaContext& cu = *static_cast<CudaPlatform::PlatformData*>(context.getPlatformData())->contexts[0];
-    if (name == CalcDeepmdForceKernel::Name())
-        return new CudaCalcDeepmdForceKernel(name, platform, cu);
+    if (name == CalcDMFFForceKernel::Name())
+        return new CudaCalcDMFFForceKernel(name, platform, cu);
     throw OpenMMException((std::string("Tried to create kernel with illegal kernel name '")+name+"'").c_str());
 }

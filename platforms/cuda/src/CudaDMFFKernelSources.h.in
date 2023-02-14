@@ -34,7 +34,7 @@
 
 #include <string>
 
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
 /**
  * This class is a central holding place for the source code of CUDA kernels.
@@ -42,11 +42,11 @@ namespace DeepmdPlugin {
  * kernels subfolder.
  */
 
-class CudaDeepmdKernelSources {
+class CudaDMFFKernelSources {
 public:
 @CUDA_FILE_DECLARATIONS@
 };
 
-} // namespace DeepmdPlugin
+} // namespace DMFFPlugin
 
 #endif /*OPENMM_CUDA_DMFF_KERNEL_SOURCES_H_*/

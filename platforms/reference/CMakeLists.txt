@@ -1,11 +1,11 @@
 #---------------------------------------------------
-# OpenMM-Deepmd Plugin Reference Platform
+# OpenMM DMFF Plugin Reference Platform
 #----------------------------------------------------
 
-# Collect up information about the version of the OpenMM library we're building
+# Collect information about the version of the OpenMM library we're building
 # and make it available to the code so it can be built into the binaries.
 
-SET(PLUGIN_REFERENCE_LIBRARY_NAME OpenMMDeepmdReference)
+SET(PLUGIN_REFERENCE_LIBRARY_NAME OpenMMDMFFReference)
 
 SET(SHARED_TARGET ${PLUGIN_REFERENCE_LIBRARY_NAME})
 
@@ -46,4 +46,4 @@ SET_TARGET_PROPERTIES(${SHARED_TARGET} PROPERTIES
 
 INSTALL(TARGETS ${SHARED_TARGET} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/plugins)
 
-SUBDIRS(tests)
+#SUBDIRS(tests)

@@ -35,6 +35,7 @@
 #include "DMFFKernels.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
+#include "ReferenceNeighborList.h"
 
 
 namespace DMFFPlugin {
@@ -52,13 +53,21 @@ private:
     // Used for CUDA Platform.
     bool hasInitialized;
     OpenMM::CudaContext& cu;
-    OpenMM::CudaArray networkForces;
+    OpenMM::CudaArray dmffForces;
     CUfunction addForcesKernel;
 
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;
-    // nnp_inter_1 and nnp_inter_2 are used for alchemical simulation.
-    DeepPot dp, dp_1, dp_2;    
+    // jax_m1 and jax_m2 are used for alchemical simulation. Not supported yet.
+    cppflow::model jax_model, jax_m1, jax_m2;
+    vector<int64_t> coord_shape(2);
+    vector<int64_t> box_shape(2);
+    vector<int64_t> pair_shape(2);
+    box_shape[0] = 3;
+    box_shape[1] = 3;
+
+    NeighborList neighborList;
+    vector<std::set<int>> exclusions;
     
     int natoms;
     int nghost = 0;
@@ -72,11 +81,8 @@ private:
     map<string, vector<int>> particleGroup4EachType;
     map<string, int> typesIndexMap;
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
-    #ifdef HIGH_PREC
-    vector<double> AddedForces;
-    #else
-    vector<float> AddedForces;
-    #endif
+    vector<double> AddedForces;    
+
 
     // Parameters for alchemical simulation.
     bool used4Alchemical = false;

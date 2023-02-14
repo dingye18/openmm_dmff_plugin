@@ -2,7 +2,7 @@
 #define OPENMM_DMFF_FORCE_PROXY_H_
 
 /* -------------------------------------------------------------------------- *
- *                                OpenMMDeepmd                              *
+ *                                OpenMM                                      *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -32,18 +32,18 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "internal/windowsExportDeepmd.h"
+#include "internal/windowsExportDMFF.h"
 #include "openmm/serialization/SerializationProxy.h"
 
 namespace OpenMM {
 
 /**
- * This is a proxy for serializing DeepmdForce objects.
+ * This is a proxy for serializing DMFFForce objects.
  */
 
-class OPENMM_EXPORT_DMFF DeepmdForceProxy : public SerializationProxy {
+class OPENMM_EXPORT_DMFF DMFFForceProxy : public SerializationProxy {
 public:
-    DeepmdForceProxy();
+    DMFFForceProxy();
     void serialize(const void* object, SerializationNode& node) const;
     void* deserialize(const SerializationNode& node) const;
 };

@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                OpenMM-Deepmd                               *
+ *                                OpenMM                                      *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -29,45 +29,44 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
 
-#include "DeepmdForce.h"
+#include "DMFFForce.h"
 #include "openmm/Platform.h"
 #include "openmm/internal/AssertionUtilities.h"
 #include "openmm/serialization/XmlSerializer.h"
 #include <iostream>
 #include <sstream>
 
-using namespace DeepmdPlugin;
+using namespace DMFFPlugin;
 using namespace OpenMM;
-using namespace dmff;
 using namespace std;
 
-extern "C" void registerDeepmdSerializationProxies();
+extern "C" void registerDMFFSerializationProxies();
 
 
 void testSerialization() {
     const double TOL = 1e-5;
-    const string graph = "../tests/frozen_model/water.pb";
+    const string graph = "../tests/dmff_test_model/lj_fluid.pb";
     const double coordUnitCoeff = 10;
     const double forceUnitCoeff = 964.8792534459;
     const double energyUnitCoeff = 96.48792534459;
     const double temperature = 300;
 
     // Create a Force.
-    DeepmdForce dp_force = DeepmdForce(graph, graph, graph);
+    DMFFForce dmff_force = DMFFForce(graph, graph, graph);
     
     stringstream buffer;
-    XmlSerializer::serialize<DeepmdForce>(&dp_force, "Force", buffer);
-    DeepmdForce* copy = XmlSerializer::deserialize<DeepmdForce>(buffer);
+    XmlSerializer::serialize<DMFFForce>(&dmff_force, "Force", buffer);
+    DMFFForce* copy = XmlSerializer::deserialize<DMFFForce>(buffer);
 
     // Compare the two forces to see if they are identical.
-    DeepmdForce& dp_force2 = *copy;
-    ASSERT_EQUAL(dp_force2.getDeepmdGraphFile(), dp_force.getDeepmdGraphFile());
+    DMFFForce& dmff_force2 = *copy;
+    ASSERT_EQUAL(dmff_force2.getDMFFGraphFile(), dmff_force.getDMFFGraphFile());
     return;
 }
 
 int main() {
     try {
-        registerDeepmdSerializationProxies();
+        registerDMFFSerializationProxies();
         testSerialization();
     }
     catch(const exception& e) {

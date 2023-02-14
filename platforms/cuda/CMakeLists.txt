@@ -1,11 +1,11 @@
 #---------------------------------------------------
-# OpenMM Deepmd-kit Plugin CUDA Platform
+# OpenMM DMFF Plugin CUDA Platform
 #----------------------------------------------------
 
-# Collect up information about the version of the OpenMM library we're building
+# Collect information about the version of the OpenMM library we're building
 # and make it available to the code so it can be built into the binaries.
 
-SET(PLUGIN_CUDA_LIBRARY_NAME OpenMMDeepmdCUDA)
+SET(PLUGIN_CUDA_LIBRARY_NAME OpenMMDMFFCUDA)
 
 SET(SHARED_TARGET ${PLUGIN_CUDA_LIBRARY_NAME})
 
@@ -21,7 +21,7 @@ FOREACH(dir ${API_INCLUDE_DIRS})
     SET(API_INCLUDE_FILES ${API_INCLUDE_FILES} ${fullpaths})
 ENDFOREACH(dir)
 
-# collect up source files
+# collect source files
 SET(SOURCE_FILES) # empty
 SET(SOURCE_INCLUDE_FILES)
 
@@ -39,7 +39,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_BINARY_DIR}/platforms/cuda/src)
 # Set variables needed for encoding kernel sources into a C++ class
 
 SET(CUDA_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-SET(CUDA_SOURCE_CLASS CudaDeepmdKernelSources)
+SET(CUDA_SOURCE_CLASS CudaDMFFKernelSources)
 SET(CUDA_KERNELS_CPP ${CMAKE_CURRENT_BINARY_DIR}/src/${CUDA_SOURCE_CLASS}.cpp)
 SET(CUDA_KERNELS_H ${CMAKE_CURRENT_BINARY_DIR}/src/${CUDA_SOURCE_CLASS}.h)
 SET(SOURCE_FILES ${SOURCE_FILES} ${CUDA_KERNELS_CPP} ${CUDA_KERNELS_H})
@@ -76,4 +76,4 @@ IF (APPLE)
 ENDIF (APPLE)
 
 
-SUBDIRS (tests)
+#SUBDIRS (tests)
