@@ -12,23 +12,23 @@ except:
     from simtk import unit as u
     from simtk.openmm.app import PDBFile, StateDataReporter, DCDReporter, Simulation
 
-from OpenMMDeepmdPlugin import DeepPotentialModel
+from OpenMMDMFFPlugin import DMFFModel
 
 
 def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", output_temp_dir = "/tmp/openmm_dmff_plugin_test_nve_output", energy_std_tol = 0.0005 ):
     if not os.path.exists(output_temp_dir):
         os.mkdir(output_temp_dir)
     
-    pdb_file = os.path.join(os.path.dirname(__file__), "../data", "lw_256_test.pdb")
-    dp_model = os.path.join(os.path.dirname(__file__), "../data", "water.pb")
-    output_dcd = os.path.join(output_temp_dir, "lw_256_test.nve.dcd")
-    output_log = os.path.join(output_temp_dir, "lw_256_test.nve.log")
+    pdb_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid.pdb")
+    dp_model = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid.pb")
+    output_dcd = os.path.join(output_temp_dir, "lj_fluid_test.nve.dcd")
+    output_log = os.path.join(output_temp_dir, "lj_fluid_test.nve.log")
     
     # Set up the simulation parameters.
     nsteps = nsteps
     time_step = time_step # unit is femtosecond.
-    report_frequency = 100
-    box = [19.807884, 0, 0, 0, 19.807884, 0, 0, 0, 19.807884]
+    report_frequency = 10
+    box = [24.413, 0, 0, 0, 24.413, 0, 0, 0, 24.413]
     box = [mm.Vec3(box[0], box[1], box[2]), mm.Vec3(box[3], box[4], box[5]), mm.Vec3(box[6], box[7], box[8])] * u.angstroms
     
     liquid_water = PDBFile(pdb_file)
@@ -37,15 +37,15 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
     num_atoms = topology.getNumAtoms()
     
     # Set up the dp_system with the dp_model.    
-    dp_model = DeepPotentialModel(dp_model)
-    dp_model.setUnitTransformCoefficients(10.0, 964.8792534459, 96.48792534459)
-    dp_system = dp_model.createSystem(topology)
+    dmff_model = DMFFModel(dp_model)
+    dmff_model.setUnitTransformCoefficients(10.0, 964.8792534459, 96.48792534459)
+    dmff_system = dmff_model.createSystem(topology)
     
     integrator = mm.VerletIntegrator(time_step*u.femtoseconds)
     platform = mm.Platform.getPlatformByName(platform_name)
     
     # Build up the simulation object.
-    sim = Simulation(topology, dp_system, integrator, platform)
+    sim = Simulation(topology, dmff_system, integrator, platform)
     sim.context.setPeriodicBoxVectors(box[0], box[1], box[2])
     sim.context.setPositions(positions)
 

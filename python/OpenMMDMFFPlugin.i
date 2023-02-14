@@ -18,7 +18,7 @@ namespace std {
 }
 
 %{
-#include "DeepmdForce.h"
+#include "DMFFForce.h"
 #include "OpenMM.h"
 #include "OpenMMAmoeba.h"
 #include "OpenMMDrude.h"
@@ -40,23 +40,12 @@ namespace std {
     }
 }
 
-/*
-%feature("shadow") DeepmdPlugin::DeepmdForce::DeepmdForce %{
-    def __init__(self, *args):
-        this = _OpenMMDeepmdPlugin.new_DeepmdForce(args[0], args[1], args[2], args[3])
-        try:
-            self.this.append(this)
-        except Exception:
-            self.this = this
-%}
-*/
-namespace DeepmdPlugin {
+namespace DMFFPlugin {
 
-class DeepmdForce : public OpenMM::Force {
+class DMFFForce : public OpenMM::Force {
 public:
-    //DeepmdForce::DeepmdForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2, const bool used4Alchemical);
-    DeepmdForce(const string& GraphFile);
-    DeepmdForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2);
+    DMFFForce(const string& GraphFile);
+    DMFFForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2);
 
     void addParticle(const int particleIndex, const string particleType);
     void addType(const int typeIndex, const string Type);
@@ -70,7 +59,7 @@ public:
     string getTypesMap() const;
 
     /*
-    * Used for alchemical simulation.
+    * Used for alchemical simulation. Not supported yet.
     */
     void setAlchemical(const bool used4Alchemical);
     void setAtomsIndex4Graph1(const vector<int> atomsIndex);
@@ -78,15 +67,15 @@ public:
     void setLambda(const double lambda);
 
     /*
-     * Add methods for casting a Force to a DeepmdForce.
+     * Add methods for casting a Force to a DMFFForce.
     */
     %extend {
-        static DeepmdPlugin::DeepmdForce& cast(OpenMM::Force& force) {
-            return dynamic_cast<DeepmdPlugin::DeepmdForce&>(force);
+        static DMFFPlugin::DMFFForce& cast(OpenMM::Force& force) {
+            return dynamic_cast<DMFFPlugin::DMFFForce&>(force);
         }
 
         static bool isinstance(OpenMM::Force& force) {
-            return (dynamic_cast<DeepmdPlugin::DeepmdForce*>(&force) != NULL);
+            return (dynamic_cast<DMFFPlugin::DMFFForce*>(&force) != NULL);
         }
     }
 };

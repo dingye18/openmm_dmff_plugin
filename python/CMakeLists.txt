@@ -1,5 +1,5 @@
-set(WRAP_FILE OpenMMDeepmdPluginWrapper.cpp)
-set(MODULE_NAME OpenMMDeepmdPlugin)
+set(WRAP_FILE OpenMMDMFFPluginWrapper.cpp)
+set(MODULE_NAME OpenMMDMFFPlugin)
 
 # Execute SWIG to generate source code for the Python module.
 add_custom_command(
@@ -9,8 +9,8 @@ add_custom_command(
         -o "${WRAP_FILE}"
         "-I${OPENMM_DIR}/include"
         "-I{DMFF_DIR}/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDeepmdPlugin.i"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDeepmdPlugin.i"
+        "${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDMFFPlugin.i"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDMFFPlugin.i"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
@@ -27,12 +27,12 @@ execute_process(
 add_custom_target(PythonInstall DEPENDS "${WRAP_FILE}")
 set(DMFFPLUGIN_HEADER_DIR "${CMAKE_SOURCE_DIR}/openmmapi/include")
 set(DMFFPLUGIN_LIBRARY_DIR "${CMAKE_BINARY_DIR}")
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDeepmdPlugin DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDMFFPlugin DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDeepmdPlugin/__init__.py ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDeepmdPlugin/__init__.py)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenMMDMFFPlugin/__init__.py ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDMFFPlugin/__init__.py)
 add_custom_command(TARGET PythonInstall
     COMMAND "${PYTHON_EXECUTABLE}" setup.py build
-    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDeepmdPlugin.py ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDeepmdPlugin
+    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDMFFPlugin.py ${CMAKE_CURRENT_BINARY_DIR}/OpenMMDMFFPlugin
     COMMAND "${PYTHON_EXECUTABLE}" setup.py install
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
