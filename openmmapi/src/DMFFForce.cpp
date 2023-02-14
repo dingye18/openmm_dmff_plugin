@@ -50,7 +50,7 @@ DMFFForce::DMFFForce(const string& GraphFile, const string& GraphFile_1, const s
     graph_file_2 = GraphFile_2;
     //this->used4Alchemical = used4Alchemical;
     this->used4Alchemical = true;
-    if(used4Alchemical){
+    /*if(used4Alchemical){
         if (!exists(graph_file_1)){
             throw OpenMMException("Graph file 1 not found: "+graph_file_1);
         }
@@ -60,15 +60,15 @@ DMFFForce::DMFFForce(const string& GraphFile, const string& GraphFile_1, const s
     }
     if (!exists(graph_file)){
         throw OpenMMException("Graph file not found: "+graph_file);
-    }
+    }*/
 }
 
 DMFFForce::DMFFForce(const string& GraphFile){
     graph_file  = GraphFile;
     this->used4Alchemical = false;
-    if (!exists(graph_file)){
+    /*if (!exists(graph_file)){
         throw OpenMMException("Graph file not found: "+graph_file);
-    }
+    }*/
 }
 
 DMFFForce::~DMFFForce(){

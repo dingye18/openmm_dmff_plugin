@@ -94,7 +94,7 @@ class DMFFModel():
         #self.numb_types = self.dp_force.getNumberTypes()
         #self.type_map_raw = self.dp_force.getTypesMap()
         #self.type_map_dict, self.dp_model_types = self.__decode_type_map(self.type_map_raw)
-        #self.IsAlchemical = False
+        self.IsAlchemical = False
         
         if model_file is not None and model_file_1 is not None and model_file_2 is not None:
             del self.dmff_force
@@ -150,8 +150,8 @@ class DMFFModel():
                 atom_type = atom.element.symbol
             elif particleNameLabeler == "atom_name":
                 atom_type = atom.name
-            if atom_type not in self.dp_model_types:
-                raise Exception(f"Atom type {atom_type} is not found in {self.dp_model_types}.")
+            #if atom_type not in self.dp_model_types:
+            #    raise Exception(f"Atom type {atom_type} is not found in {self.dp_model_types}.")
             
             dmff_system.addParticle(atom.element.mass)
             self.dmff_force.addParticle(atom.index, atom_type)
@@ -178,6 +178,6 @@ class DMFFModel():
             self.dp_force.setAtomsIndex4Graph2(particles_group_2)
             self.dp_force.setLambda(Lambda)
         
-        dmff_system.addForce(self.dp_force)
+        dmff_system.addForce(self.dmff_force)
         
         return dmff_system

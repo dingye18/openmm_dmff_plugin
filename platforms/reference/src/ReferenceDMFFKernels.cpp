@@ -60,7 +60,14 @@ static Vec3* extractBoxVectors(ContextImpl& context) {
     return (Vec3*) data->periodicBoxVectors;
 }
 
-ReferenceCalcDMFFForceKernel::~ReferenceCalcDMFFForceKernel(){return;}
+ReferenceCalcDMFFForceKernel::~ReferenceCalcDMFFForceKernel(){
+    delete &jax_model;
+    if(used4Alchemical){
+        delete &jax_m1;
+        delete &jax_m2;
+    }
+    return;
+}
 
 void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& force) {
     graph_file = force.getDMFFGraphFile();
@@ -216,8 +223,8 @@ double ReferenceCalcDMFFForceKernel::execute(ContextImpl& context, bool includeF
     std::vector<int32_t> pairs_v;
     for (int ii = 0; ii < totpairs; ii++)
     {
-        int32_t i1 = neighborList[ii].first;
-        int32_t i2 = neighborList[ii].second;
+        int32_t i1 = neighborList[ii].second;
+        int32_t i2 = neighborList[ii].first;
         pairs_v.push_back(i1);
         pairs_v.push_back(i2);
     }

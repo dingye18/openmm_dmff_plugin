@@ -44,7 +44,7 @@ DMFFForceProxy::DMFFForceProxy() : SerializationProxy("DMFFForce") {
 }
 
 void DMFFForceProxy::serialize(const void* object, SerializationNode& node) const {
-    node.setIntProperty("version", 0.1);
+    node.setIntProperty("version", 0);
     const DMFFForce& force = *reinterpret_cast<const DMFFForce*>(object);
     node.setStringProperty("file", force.getDMFFGraphFile());
     node.setStringProperty("file1", force.getGraph1_4Alchemical());
@@ -52,7 +52,7 @@ void DMFFForceProxy::serialize(const void* object, SerializationNode& node) cons
 }
 
 void* DMFFForceProxy::deserialize(const SerializationNode& node) const {
-    if (node.getIntProperty("version") != 0.1)
+    if (node.getIntProperty("version") != 0)
         throw OpenMMException("Unsupported version number");
     DMFFForce* force = new DMFFForce(node.getStringProperty("file"), node.getStringProperty("file1"), node.getStringProperty("file2"));
     return force;

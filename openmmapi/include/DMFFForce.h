@@ -43,8 +43,8 @@
 
 using namespace std;
 
-typedef double VALUETYPE;
-typedef double ENERGYTYPE;
+typedef float VALUETYPE;
+typedef float ENERGYTYPE;
 
 namespace DMFFPlugin {
 
