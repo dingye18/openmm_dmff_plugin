@@ -36,7 +36,7 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
     positions = liquid_water.getPositions()
     num_atoms = topology.getNumAtoms()
     
-    # Set up the dp_system with the dp_model.    
+    # Set up the dmff_system with the dmff_model.    
     dmff_model = DMFFModel(dp_model)
     dmff_model.setUnitTransformCoefficients(1, 1, 1)
     dmff_system = dmff_model.createSystem(topology)

@@ -1,64 +1,58 @@
-# OpenMM Plugin for Deepmd-kit
+# OpenMM Plugin for DMFF
 
 
-This is a plugin for [OpenMM](http://openmm.org) that allows DeepPotential model
-to be used for defining forces. 
-It is implemented with [Deepmd-kit](https://github.com/deepmodeling/dmff-kit).
-To use it, you create a TensorFlow graph with Deepmd-kit that takes particle positions as input
-and produces forces and energy as output. This plugin uses the graph to apply
-forces to particles during a simulation.
+This is a plugin for [OpenMM](http://openmm.org) that used the trained JAX model by [DMFF](https://github.com/deepmodeling/DMFF) as an independent Force class for dynamics.
+To use it, you need to create a JAX graph with DMFF with the input are the atom coordinates, box size and neighbor list, and output the energy and forces.
 
 ## Installation
 
 ### Install from source
-This plugin requires the library of **OpenMM, v7.6**, **Deepmd-kit C API package, v2.2.0.beta.0**. 
-Compile plugin from source with following steps.
-
-1. Prepare the conda environment.
-   ```
-   conda create -n dp_openmm
-   conda activate dp_openmm
-   conda install -c conda-forge openmm cudatoolkit=11.6
-   ```
-
-2. Download and install the Deepmd-kit C API library.
+To compile this plugin from source, three dependencies are required:
+* **OpenMM, v7.7**: Could be installed with `conda install -c conda-forge openmm cudatoolkit=11.7`.  
+* **[Libtensorflow](https://www.tensorflow.org/install/lang_c), v2.11.0**: Installed as the following steps:
    ```shell
-   wget https://github.com/deepmodeling/dmff-kit/releases/download/v2.2.0.b0/libdmff_c.tar.gz
-   # Extract the C API library of Deepmd-kit to the directory of your choice.
-   tar -xf libdmff_c.tar.gz -C /usr/local/libdmff_c 
+   FILENAME=libtensorflow-{cpu/gpu}-linux-x86_64-2.11.0.tar.gz
+   wget -q --no-check-certificate https://storage.googleapis.com/tensorflow/libtensorflow/${FILENAME}
+   tar -C ${LIBTENSORFLOW_INSTALLED_DIR} -xzf ${FILENAME}
+   export LD_LIBRARY_PATH=${LIBTENSORFLOW_INSTALLED_DIR}/lib:$LD_LIBRARY_PATH
    ```
+* **[cppflow](https://github.com/serizba/cppflow) header**: Since the class `cppflow::model` have no empty constructor. A small patch into the header file is required. 
+  ```shell
+  git clone https://github.com/serizba/cppflow.git
+  cd cppflow
+  git apply ${openmm_dmff_plugin_source_dir}/tests/cppflow_empty_constructor.patch
+  mkdir build && cd build
+  cmake .. -Dtensorflow_INCLUDE_DIRS=${LIBTENSORFLOW_INSTALLED_DIR}/include -Dtensorflow_LIBRARIES=${LIBTENSORFLOW_INSTALLED_DIR}/lib/libtensorflow.so
+  ```
 
-3. Clone this repository and create a directory in which to build the plugin.
+Compile plugin from source as following steps.
+
+1. Clone this repository and create a directory in which to build the plugin.
    ```shell
-   git clone https://github.com/JingHuangLab/openmm_dmff_plugin.git
+   git clone https://github.com/dingye18/openmm_dmff_plugin.git
    cd openmm_dmff_plugin && mkdir build && cd build
    ```
-4. Run `cmake` command with required parameters.
-   ```shell
-   cmake .. -DOPENMM_DIR=${OPENMM_INSTALLED_DIR} -DDMFF_DIR=${LIBDMFF_C_INSTALLED_DIR}
-   ```
-   `OPENMM_INSTALLED_DIR` is the directory where OpenMM is installed.
-   If you installed OpenMM from conda, it is the directory of the location of environment `dp_openmm`.
-   `LIBDMFF_C_INSTALLED_DIR` is the directory where Deepmd-kit C API library is installed.
-   For example, if you installed Deepmd-kit C API library to `/usr/local/libdmff_c`, 
-   then `LIBDMFF_C_INSTALLED_DIR` is `/usr/local/libdmff_c`.
 
-5. Compile the shared library.
+2. Run `cmake` command with required parameters.
    ```shell
+   cmake .. -DOPENMM_DIR=${OPENMM_INSTALLED_DIR} -DCPPFLOW_DIR=${CPPFLOW_INSTALLED_DIR} -DTENSORFLOW_DIR=${LIBTENSORFLOW_INSTALLED_DIR}
    make && make install
-   ```
-   It will install the plugin to the subdirectory of `OPENMM_DIR` automatically.
-
-6. Test the plugin C++ interface and install the Python module of this plugin into conda environment
-   ```shell
-   make test
    make PythonInstall
-   python -m OpenMMDeepmdPlugin.tests.test_dp_plugin_nve
-   python -m OpenMMDeepmdPlugin.tests.test_dp_plugin_nve --platform CUDA
+   ```
+   
+3. Test the plugin in Python interface, reference platform.
+   ```shell
+   python -m OpenMMDMFFPlugin.tests.test_dmff_plugin_nve -n 100
    ```
 ## Usage
+Add the following lines to your Python script to use the plugin.
+More details can refer to the script in `python/OpenMMDMFFPlugin/tests/test_dmff_plugin_nve.py`.
 
-In the [tests](./tests) directory, you can find [test_dmff_simulation.py](./tests/test_dmff_simulation.py) and [test_dmff_alchemical.py](./tests/test_dmff_alchemical.py) two files for reference.
-That's used for running of this plugin with on trained [water model](./tests/frozen_model/water.pb).
-Alchemical simulation feature for Deepmd-kit is also implemented in this plugin. 
-More details about the alchemical simulation can be refered to [AlchemicalProtocol.pdf](./tests/refer/AlchemicalProtocol.pdf).
+```python
+
+from OpenMMDMFFPlugin import DMFFModel
+# Set up the dmff_system with the dmff_model.    
+dmff_model = DMFFModel(dp_model)
+dmff_model.setUnitTransformCoefficients(1, 1, 1)
+dmff_system = dmff_model.createSystem(topology)
+```
