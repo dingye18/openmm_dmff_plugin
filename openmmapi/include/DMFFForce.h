@@ -76,7 +76,7 @@ public:
      */
     void setUnitTransformCoefficients(const double coordCoefficient, const double forceCoefficient, const double energyCoefficient);
     /**
-     * @brief Set the NNP whether to use PBC.
+     * @brief Set the DMFF whether to use PBC.
      * 
      * @param use_pbc : bool value.
      */

@@ -46,9 +46,6 @@ CudaCalcDMFFForceKernel::~CudaCalcDMFFForceKernel(){
 
 void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& force){
     graph_file = force.getDMFFGraphFile();
-    type4EachParticle = force.getType4EachParticle();
-    typesIndexMap = force.getTypesIndexMap();
-    used4Alchemical = force.alchemical();
     forceUnitCoeff = force.getForceUnitCoefficient();
     energyUnitCoeff = force.getEnergyUnitCoefficient();
     coordUnitCoeff = force.getCoordUnitCoefficient();
@@ -59,22 +56,15 @@ void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& 
     exclusions.resize(natoms);
    
     // Load the ordinary graph firstly.
-    jax_model = cppflow::model(graph_file);
+    jax_model.init(graph_file);
 
     // Initialize the ordinary input and output array.
     // Initialize the input tensor.
     dener = 0.;
     dforce = vector<VALUETYPE>(natoms * 3, 0.);
-    dvirial = vector<VALUETYPE>(9, 0.);
     dcoord = vector<VALUETYPE>(natoms * 3, 0.);
     dbox = vector<VALUETYPE>(9, 0.);
-    dtype = vector<int>(natoms, 0);    
-    // Set atom type;
-    for(int ii = 0; ii < natoms; ii++){
-        // ii is the atom index of each particle.
-        dtype[ii] = typesIndexMap[type4EachParticle[ii]];
-    }
-
+        
     AddedForces = vector<double>(natoms * 3, 0.0);
     // Set for CUDA context.
     cu.setAsCurrent();
@@ -108,7 +98,7 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
     dbox[6] = box[2][0] * coordUnitCoeff;
     dbox[7] = box[2][1] * coordUnitCoeff;
     dbox[8] = box[2][2] * coordUnitCoeff;
-    auto dbox_tensor = cppflow::tensor(dbox, box_shape);
+    cppflow::tensor box_tensor = cppflow::tensor(dbox, box_shape);
 
     // Set input coord.
     for(int ii = 0; ii < natoms; ++ii){
@@ -117,7 +107,7 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
         dcoord[ii * 3 + 1] = pos[ii][1] * coordUnitCoeff;
         dcoord[ii * 3 + 2] = pos[ii][2] * coordUnitCoeff;
     }
-    auto dcoord_tensor = cppflow::tensor(dcoord, coord_shape);
+    coord_tensor = cppflow::tensor(dcoord, coord_shape);
 
     // Fetch the neighbor list for input pairs tensor.
     computeNeighborListVoxelHash(
@@ -131,20 +121,20 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
         0.0
     );
     int totpairs = neighborList.size();
-    std::vector<int32_t> pairs_v;
+    pairs_v = vector<int32_t>(totpairs * 2);
     for (int ii = 0; ii < totpairs; ii ++){
-        pairs_v.push_back(neighborList[ii].first);
-        pairs_v.push_back(neighborList[ii].second);
+        pairs_v[ ii * 2 + 0 ] = neighborList[ii].second;
+        pairs_v[ ii * 2 + 1 ] = neighborList[ii].first;
     }
     pair_shape[0] = totpairs;
     pair_shape[1] = 2;
-    auto pair_tensor = cppflow::tensor(pairs_v, pair_shape);
+    pair_tensor = cppflow::tensor(pairs_v, pair_shape);
 
     // Calculate the energy and forces.
-    auto output = jax_model({{"serving_default_args_tf_0:0", dcoord_tensor}, {"serving_default_args_tf_1:0", dbox_tensor}, {"serving_default_args_tf_2:0", pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
+    output_tensors = jax_model({{"serving_default_args_tf_0:0", coord_tensor}, {"serving_default_args_tf_1:0", box_tensor}, {"serving_default_args_tf_2:0", pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
     
-    dener = output[0].get_data<ENERGYTYPE>()[0];
-    dforce = output[1].get_data<VALUETYPE>();    
+    dener = output_tensors[0].get_data<ENERGYTYPE>()[0];
+    dforce = output_tensors[1].get_data<VALUETYPE>();    
     
     
     // Transform the unit from eV/A to KJ/(mol*nm)

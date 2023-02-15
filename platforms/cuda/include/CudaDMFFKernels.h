@@ -59,11 +59,15 @@ private:
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;
     // jax_m1 and jax_m2 are used for alchemical simulation. Not supported yet.
-    cppflow::model jax_model, jax_m1, jax_m2;
+    cppflow::model jax_model;
     vector<int64_t> coord_shape = vector<int64_t>(2);
     vector<int64_t> box_shape{3, 3};
     vector<int64_t> pair_shape = vector<int64_t>(2);
-    
+    vector<int32_t> pairs_v;
+    cppflow::tensor coord_tensor, box_tensor, pair_tensor;
+    vector<cppflow::tensor> output_tensors;
+
+
     OpenMM::NeighborList neighborList;
     vector<std::set<int>> exclusions;
     
@@ -71,13 +75,8 @@ private:
     int nghost = 0;
     ENERGYTYPE dener;
     vector<VALUETYPE> dforce;
-    vector<VALUETYPE> dvirial;
     vector<VALUETYPE> dcoord;
     vector<VALUETYPE> dbox;
-    vector<int> dtype;
-    map<int, string> type4EachParticle;
-    map<string, vector<int>> particleGroup4EachType;
-    map<string, int> typesIndexMap;
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
     vector<double> AddedForces;    
 

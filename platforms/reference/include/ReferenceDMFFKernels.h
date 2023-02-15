@@ -74,14 +74,14 @@ private:
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;
     // jax_m2 and jax_m3 are used for alchemical simulation.
-    cppflow::model jax_model, jax_m1, jax_m2;
+    cppflow::model jax_model;
     std::vector<int64_t> coord_shape = vector<int64_t>(2); 
     std::vector<int64_t> coord_shape_1 = vector<int64_t>(2); 
     std::vector<int64_t> coord_shape_2 = vector<int64_t>(2);
     std::vector<int64_t> box_shape{3, 3};
     std::vector<int64_t> pair_shape = vector<int64_t>(2);
-    //box_shape[0] = 3;
-    //box_shape[1] = 3;
+    std::vector<cppflow::tensor> output;
+    cppflow::tensor coord_tensor, box_tensor, pair_tensor;
 
     OpenMM::NeighborList neighborList;
     std::vector<std::set<int>> exclusions;
@@ -89,32 +89,12 @@ private:
     int natoms;
     ENERGYTYPE dener;
     vector<VALUETYPE> dforce;
-    vector<VALUETYPE> dvirial;
     vector<VALUETYPE> dcoord;
     vector<VALUETYPE> dbox;
-    vector<int> dtype;
+    std::vector<int32_t> dpairs;
 
-    map<int, string> type4EachParticle;
-    map<string, vector<int>> particleGroup4EachType;
-    map<string, int> typesIndexMap;
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
     vector<double> AddedForces;
-
-    // Parameters for alchemical simulation.
-    bool used4Alchemical = false;
-    double lambda; // U = lambda * U_A + (1 - lambda) * (U_1 + U_2). Where U_A comes from the original graph, U_1 and U_2 come from two alchemical graph.
-    vector<int> atomsIndex4Graph1;
-    vector<int> atomsIndex4Graph2;
-    map<int, vector<VALUETYPE>> dcoord4alchemical;
-    map<int, vector<VALUETYPE>> dbox4alchemical;
-    map<int, vector<int>> dtype4alchemical;
-
-    map<int, ENERGYTYPE> dener4alchemical;
-    map<int, vector<VALUETYPE>> dforce4alchemical;
-    map<int, vector<VALUETYPE>> dvirial4alchemical;
-
-    map<int, int> natoms4alchemical;
-    vector<pair<int, int>> atomsIndexMap4U_B;
 };
 
 } // namespace DMFFPlugin

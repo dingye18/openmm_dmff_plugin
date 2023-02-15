@@ -75,6 +75,9 @@ DMFFForce::~DMFFForce(){
     type4EachParticle.clear();
     particleGroup4EachType.clear();
     typesIndexMap.clear();
+    bondsList.clear();
+    //delete coordCoeff, forceCoeff, energyCoeff;
+    //delete numb_types;
 }
 
 
