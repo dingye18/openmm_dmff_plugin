@@ -8,13 +8,14 @@ To use it, you need to create a JAX graph with DMFF with the input are the atom 
 
 ### Install from source
 To compile this plugin from source, three dependencies are required:
-* **OpenMM, v7.7**: Could be installed with `conda install -c conda-forge openmm cudatoolkit=11.7`.  
-* **[Libtensorflow](https://www.tensorflow.org/install/lang_c), v2.11.0**: Installed as the following steps:
+* **OpenMM, v7.7**: Could be installed with `conda install -c conda-forge openmm cudatoolkit=11.6`.  
+* **[Tensorflow C API](https://www.tensorflow.org), v2.9.1**: Installed from source or download the pre-built binary from conda deepmodeling channel. Download from official website is not recommended since the issue of [C API in GPU XLA platform](https://github.com/tensorflow/tensorflow/issues/50458#issuecomment-1140817145).:
    ```shell
-   FILENAME=libtensorflow-{cpu/gpu}-linux-x86_64-2.11.0.tar.gz
-   wget -q --no-check-certificate https://storage.googleapis.com/tensorflow/libtensorflow/${FILENAME}
-   tar -C ${LIBTENSORFLOW_INSTALLED_DIR} -xzf ${FILENAME}
-   export LD_LIBRARY_PATH=${LIBTENSORFLOW_INSTALLED_DIR}/lib:$LD_LIBRARY_PATH
+   # Compile from source.
+   wget https://raw.githubusercontent.com/deepmodeling/deepmd-kit/master/source/install/build_tf.py
+   python build_tf.py --cuda --cudnn-path {Path to cudnn installed dir} --prefix ${TENSORFLOW_LIB_INSTALLED_DIR}
+   # Download from conda deepmodeling channel.
+   conda install -c deepmodeling libtensorflow_cc=2.9.0=cuda116h4bf587c_0
    ```
 * **[cppflow](https://github.com/serizba/cppflow) header**: Since the class `cppflow::model` have no empty constructor. A small patch into the header file is required. 
   ```shell
@@ -43,6 +44,7 @@ Compile plugin from source as following steps.
 3. Test the plugin in Python interface, reference platform.
    ```shell
    python -m OpenMMDMFFPlugin.tests.test_dmff_plugin_nve -n 100
+   python -m OpenMMDMFFPlugin.tests.test_dmff_plugin_nvt -n 100 --platform CUDA
    ```
 ## Usage
 Add the following lines to your Python script to use the plugin.
