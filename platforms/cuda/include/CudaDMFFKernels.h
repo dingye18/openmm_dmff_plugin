@@ -58,7 +58,6 @@ private:
 
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;
-    // jax_m1 and jax_m2 are used for alchemical simulation. Not supported yet.
     cppflow::model jax_model;
     vector<int64_t> coord_shape = vector<int64_t>(2);
     vector<int64_t> box_shape{3, 3};
@@ -66,7 +65,8 @@ private:
     vector<int32_t> pairs_v;
     cppflow::tensor coord_tensor, box_tensor, pair_tensor;
     vector<cppflow::tensor> output_tensors;
-
+    vector<std::string> operations;
+    vector<std::string> input_node_names = vector<std::string>(3);
 
     OpenMM::NeighborList neighborList;
     vector<std::set<int>> exclusions;
@@ -80,20 +80,6 @@ private:
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
     vector<double> AddedForces;    
 
-
-    // Parameters for alchemical simulation.
-    bool used4Alchemical = false;
-    double lambda; // U = lambda * U_A + (1 - lambda) * (U_1 + U_2). Where U_A comes from the original graph, U_1 and U_2 comes from alchemical graph.
-    vector<int> atomsIndex4Graph1;
-    vector<int> atomsIndex4Graph2;
-    map<int, vector<VALUETYPE>> dcoord4alchemical;
-    map<int, vector<VALUETYPE>> dbox4alchemical;
-    map<int, vector<int>> dtype4alchemical;
-    map<int, ENERGYTYPE> dener4alchemical;
-    map<int, vector<VALUETYPE>> dforce4alchemical;
-    map<int, vector<VALUETYPE>> dvirial4alchemical;
-    map<int, int> natoms4alchemical;
-    vector<pair<int, int>> atomsIndexMap4U_B;
 };
 
 

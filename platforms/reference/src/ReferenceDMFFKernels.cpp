@@ -79,6 +79,21 @@ void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFFo
     // Load the ordinary graph firstly.
     jax_model.init(graph_file);
 
+    operations = jax_model.get_operations();
+    for (int ii = 0; ii < operations.size(); ii++){
+        if (operations[ii].find("serving")!= std::string::npos){
+            if (operations[ii].find("0")!= std::string::npos){
+                input_node_names[0] = operations[ii]+":0";
+            } else if (operations[ii].find("1") != std::string::npos){
+                input_node_names[1] = operations[ii]+":0";
+            } else if (operations[ii].find("2") != std::string::npos){
+                input_node_names[2] = operations[ii]+":0";
+            } else {
+                std::cout << "Warning: Unknown input node name: " << operations[ii] << std::endl;
+            }
+        }
+    }
+
     // Initialize the ordinary input and output array.
     // Initialize the input tensor.
     dener = 0.;
@@ -143,7 +158,7 @@ double ReferenceCalcDMFFForceKernel::execute(ContextImpl& context, bool includeF
     pair_shape[1] = 2;
     cppflow::tensor pair_tensor = cppflow::tensor(dpairs, pair_shape);
 
-    output = jax_model({{"serving_default_args_tf_0:0", coord_tensor}, {"serving_default_args_tf_1:0", box_tensor}, {"serving_default_args_tf_2:0", pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
+    output = jax_model({{input_node_names[0], coord_tensor}, {input_node_names[1], box_tensor}, {input_node_names[2], pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
 
     dener = output[0].get_data<ENERGYTYPE>()[0];
     dforce = output[1].get_data<VALUETYPE>();

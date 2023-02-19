@@ -82,6 +82,8 @@ private:
     std::vector<int64_t> pair_shape = vector<int64_t>(2);
     std::vector<cppflow::tensor> output;
     cppflow::tensor coord_tensor, box_tensor, pair_tensor;
+    vector<std::string> operations;
+    vector<std::string> input_node_names = vector<std::string>(3);
 
     OpenMM::NeighborList neighborList;
     std::vector<std::set<int>> exclusions;

@@ -20,7 +20,11 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
         os.mkdir(output_temp_dir)
     
     pdb_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid.pdb")
-    dp_model = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid")
+    if platform_name == "Reference":
+        dmff_model_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid")
+    elif platform_name == "CUDA":
+        dmff_model_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid_gpu")
+
     output_dcd = os.path.join(output_temp_dir, "lj_fluid_test.nve.dcd")
     output_log = os.path.join(output_temp_dir, "lj_fluid_test.nve.log")
     
@@ -37,7 +41,7 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
     num_atoms = topology.getNumAtoms()
     
     # Set up the dmff_system with the dmff_model.    
-    dmff_model = DMFFModel(dp_model)
+    dmff_model = DMFFModel(dmff_model_file)
     dmff_model.setUnitTransformCoefficients(1, 1, 1)
     dmff_system = dmff_model.createSystem(topology)
     
