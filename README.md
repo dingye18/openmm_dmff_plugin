@@ -14,6 +14,7 @@ To compile this plugin from source, three dependencies are required:
    # Compile from source.
    wget https://raw.githubusercontent.com/deepmodeling/deepmd-kit/master/source/install/build_tf.py
    python build_tf.py --cuda --cudnn-path {Path to cudnn installed dir} --prefix ${TENSORFLOW_LIB_INSTALLED_DIR}
+   cp -r ../packages/tensorflow/tensorflow-2.9.1/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
    # Download from conda deepmodeling channel.
    conda install -c deepmodeling libtensorflow_cc=2.9.0=cuda116h4bf587c_0
    ```
