@@ -17,7 +17,7 @@ To compile this plugin from source, three dependencies are required:
    cp -r ../packages/tensorflow/tensorflow-2.9.1/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
    # Download from conda deepmodeling channel.
    conda install -c deepmodeling libtensorflow_cc=2.9.0=cuda116h4bf587c_0
-   cp -r ../packages/tensorflow/tensorflow-2.9.1/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
+   cp -r ${TENSORFLOW_SOURCE_DIR}/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
    ```
 * **[cppflow](https://github.com/serizba/cppflow) header**: Since the class `cppflow::model` have no empty constructor. A small patch into the header file is required. 
   ```shell
