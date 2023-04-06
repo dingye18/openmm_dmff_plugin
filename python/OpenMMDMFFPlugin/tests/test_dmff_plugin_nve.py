@@ -44,13 +44,21 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
     dmff_model = DMFFModel(dmff_model_file)
     dmff_model.setUnitTransformCoefficients(1, 1, 1)
     dmff_system = dmff_model.createSystem(topology)
+    dmff_system.setDefaultPeriodicBoxVectors(box[0], box[1], box[2])
+    print(dmff_system.usesPeriodicBoundaryConditions())
+    
+    non_bonded_force = mm.NonbondedForce()
+    non_bonded_force.setNonbondedMethod(mm.NonbondedForce.CutoffPeriodic)
+    non_bonded_force.setCutoffDistance(1.2 * u.nanometers)
+    for ii in range(num_atoms):
+        non_bonded_force.addParticle(-1, 1, 0)
+    dmff_system.addForce(non_bonded_force)
     
     integrator = mm.VerletIntegrator(time_step*u.femtoseconds)
     platform = mm.Platform.getPlatformByName(platform_name)
     
     # Build up the simulation object.
     sim = Simulation(topology, dmff_system, integrator, platform)
-    sim.context.setPeriodicBoxVectors(box[0], box[1], box[2])
     sim.context.setPositions(positions)
 
     # Add state reporters

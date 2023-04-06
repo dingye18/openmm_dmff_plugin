@@ -35,6 +35,7 @@
 #include "DMFFKernels.h"
 #include "openmm/cuda/CudaContext.h"
 #include "openmm/cuda/CudaArray.h"
+#include "openmm/cuda/CudaNonbondedUtilities.h"
 #include "openmm/reference/ReferenceNeighborList.h"
 
 
@@ -45,7 +46,10 @@ namespace DMFFPlugin {
  */
 class CudaCalcDMFFForceKernel : public CalcDMFFForceKernel{
 public:
-    CudaCalcDMFFForceKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu):CalcDMFFForceKernel(name, platform), cu(cu){};
+    CudaCalcDMFFForceKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu):CalcDMFFForceKernel(name, platform), cu(cu){
+        //nb = cu.getNonbondedUtilities();
+        //singlePairs = nb.getSinglePairs();
+    };
     ~CudaCalcDMFFForceKernel();
     void initialize(const OpenMM::System& system, const DMFFForce& force);
     double execute(OpenMM::ContextImpl& context, bool includeForces, bool includeEnergy);
@@ -55,6 +59,9 @@ private:
     OpenMM::CudaContext& cu;
     OpenMM::CudaArray dmffForces;
     CUfunction addForcesKernel;
+    //OpenMM::CudaNonbondedUtilities& nb;
+    //OpenMM::CudaArray& singlePairs;
+
 
     // graph_file 1 and 2 are used for alchemical simulation.
     std::string graph_file, graph_file_1, graph_file_2;

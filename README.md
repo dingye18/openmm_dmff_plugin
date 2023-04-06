@@ -53,7 +53,6 @@ Add the following lines to your Python script to use the plugin.
 More details can refer to the script in `python/OpenMMDMFFPlugin/tests/test_dmff_plugin_nve.py`.
 
 ```python
-
 from OpenMMDMFFPlugin import DMFFModel
 # Set up the dmff_system with the dmff_model.    
 dmff_model = DMFFModel(dp_model)

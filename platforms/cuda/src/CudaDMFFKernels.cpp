@@ -86,6 +86,10 @@ void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& 
     dmffForces.initialize(cu, 3*natoms, sizeof(double), "dmffForces");
     CUmodule module = cu.createModule(CudaDMFFKernelSources::DMFFForce, defines);
     addForcesKernel = cu.getKernel(module, "addForces");
+
+    // Fetch the  nonbonded utilities for neighbor list
+    //nb = cu.getNonbondedUtilities();
+
 }
 
 
@@ -133,12 +137,52 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
         1.2,
         0.0
     );
+
+    //singlePairs = nb.getSinglePairs();
+    int num_pairs = cu.getNonbondedUtilities().getSinglePairs().getSize();
+    vector<int2> pairs_cpu(num_pairs);
+    cu.getNonbondedUtilities().getSinglePairs().download(pairs_cpu);
+    std::cout<<"single pairs in DMFF: "<<pairs_cpu.size()<<std::endl;
+    for(int i=0;i<pairs_cpu.size();i++){
+        std::cout<<pairs_cpu[i].x<<" "<<pairs_cpu[i].y<<std::endl;
+    }
+    std::cout<<"end single pairs in DMFF"<<std::endl;
+
+    // Interacting Tiles and Interacting Atoms.
+    int num_interacting_tiles = cu.getNonbondedUtilities().getInteractingTiles().getSize();
+    int num_interacting_atoms = cu.getNonbondedUtilities().getInteractingAtoms().getSize();
+    int num_interaction_count = cu.getNonbondedUtilities().getInteractionCount().getSize();
+    vector<int> interaction_count(num_interaction_count);
+    vector<int> interacting_tiles(num_interacting_tiles);
+    vector<int> interacting_atoms(num_interacting_atoms);
+    cu.getNonbondedUtilities().getInteractingTiles().download(interacting_tiles);
+    cu.getNonbondedUtilities().getInteractingAtoms().download(interacting_atoms);
+    cu.getNonbondedUtilities().getInteractionCount().download(interaction_count);
+    std::cout<<"interacting tiles in DMFF: "<<interacting_tiles.size()<<std::endl;
+    for(int i=0;i<interacting_tiles.size();i++){
+        std::cout<<interacting_tiles[i]<<std::endl;
+    }
+    std::cout<<"interacting atoms in DMFF: "<<interacting_atoms.size()<<std::endl;
+    for(int i=0;i<interacting_atoms.size();i++){
+        std::cout<<interacting_atoms[i]<<std::endl;
+    }
+    std::cout<<"interaction count in DMFF: "<<interaction_count.size()<<std::endl;
+    for(int i=0;i<interaction_count.size();i++){
+        std::cout<<interaction_count[i]<<std::endl;
+    }
+
+
+
     int totpairs = neighborList.size();
     pairs_v = vector<int32_t>(totpairs * 2);
+    std::cout<<"neighbor list size in Reference NeighborListVoxelHash: "<<totpairs<<std::endl;
+
     for (int ii = 0; ii < totpairs; ii ++){
         pairs_v[ ii * 2 + 0 ] = neighborList[ii].second;
         pairs_v[ ii * 2 + 1 ] = neighborList[ii].first;
+        std::cout<<neighborList[ii].first<<" "<<neighborList[ii].second<<std::endl;
     }
+    std::cout<<"end neighbor list in Reference NeighborListVoxelHash"<<std::endl;
     pair_shape[0] = totpairs;
     pair_shape[1] = 2;
     pair_tensor = cppflow::tensor(pairs_v, pair_shape);
