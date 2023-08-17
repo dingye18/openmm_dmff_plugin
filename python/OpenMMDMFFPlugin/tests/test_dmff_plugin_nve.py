@@ -21,7 +21,7 @@ def test_dmff_nve(nsteps = 1000, time_step = 0.2, platform_name = "Reference", o
     
     pdb_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid.pdb")
     if platform_name == "Reference":
-        dmff_model_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid")
+        dmff_model_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid_gpu")
     elif platform_name == "CUDA":
         dmff_model_file = os.path.join(os.path.dirname(__file__), "../data", "lj_fluid_gpu")
 
