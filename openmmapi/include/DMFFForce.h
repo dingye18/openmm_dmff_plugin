@@ -43,9 +43,15 @@
 
 using namespace std;
 
+#if HIGH_PRECISION
 typedef double FORCETYPE;
 typedef double COORDTYPE;
 typedef double ENERGYTYPE;
+#else
+typedef float FORCETYPE;
+typedef float COORDTYPE;
+typedef double ENERGYTYPE;
+#endif
 
 namespace DMFFPlugin {
 
