@@ -97,9 +97,9 @@ void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFFo
     // Initialize the ordinary input and output array.
     // Initialize the input tensor.
     dener = 0.;
-    dforce = vector<VALUETYPE>(natoms * 3, 0.);
-    dcoord = vector<VALUETYPE>(natoms * 3, 0.);
-    dbox = vector<VALUETYPE>(9, 0.);
+    dforce = vector<FORCETYPE>(natoms * 3, 0.);
+    dcoord = vector<COORDTYPE>(natoms * 3, 0.);
+    dbox = vector<COORDTYPE>(9, 0.);
     
     AddedForces = vector<double>(natoms * 3, 0.0);
 }
@@ -161,13 +161,13 @@ double ReferenceCalcDMFFForceKernel::execute(ContextImpl& context, bool includeF
     output = jax_model({{input_node_names[0], coord_tensor}, {input_node_names[1], box_tensor}, {input_node_names[2], pair_tensor}}, {"PartitionedCall:0", "PartitionedCall:1"});
 
     dener = output[0].get_data<ENERGYTYPE>()[0];
-    dforce = output[1].get_data<VALUETYPE>();
+    dforce = output[1].get_data<FORCETYPE>();
 
     // Transform the unit from output units to KJ/(mol*nm)
     for(int ii = 0; ii < natoms; ii ++){
-        AddedForces[ii * 3 + 0] = dforce[ii * 3 + 0] * forceUnitCoeff;
-        AddedForces[ii * 3 + 1] = dforce[ii * 3 + 1] * forceUnitCoeff;
-        AddedForces[ii * 3 + 2] = dforce[ii * 3 + 2] * forceUnitCoeff;
+        AddedForces[ii * 3 + 0] = - dforce[ii * 3 + 0] * forceUnitCoeff;
+        AddedForces[ii * 3 + 1] = - dforce[ii * 3 + 1] * forceUnitCoeff;
+        AddedForces[ii * 3 + 2] = - dforce[ii * 3 + 2] * forceUnitCoeff;
     }
     // Transform the unit from output units to KJ/mol
     dener = dener * energyUnitCoeff;

@@ -43,8 +43,9 @@
 
 using namespace std;
 
-typedef float VALUETYPE;
-typedef float ENERGYTYPE;
+typedef double FORCETYPE;
+typedef double COORDTYPE;
+typedef double ENERGYTYPE;
 
 namespace DMFFPlugin {
 

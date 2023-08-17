@@ -90,9 +90,9 @@ private:
 
     int natoms;
     ENERGYTYPE dener;
-    vector<VALUETYPE> dforce;
-    vector<VALUETYPE> dcoord;
-    vector<VALUETYPE> dbox;
+    vector<FORCETYPE> dforce;
+    vector<COORDTYPE> dcoord;
+    vector<COORDTYPE> dbox;
     std::vector<int32_t> dpairs;
 
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;

@@ -74,9 +74,9 @@ private:
     int natoms;
     int nghost = 0;
     ENERGYTYPE dener;
-    vector<VALUETYPE> dforce;
-    vector<VALUETYPE> dcoord;
-    vector<VALUETYPE> dbox;
+    vector<FORCETYPE> dforce;
+    vector<COORDTYPE> dcoord;
+    vector<COORDTYPE> dbox;
     double forceUnitCoeff, energyUnitCoeff, coordUnitCoeff;
     vector<double> AddedForces;    
 
