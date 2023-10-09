@@ -1,8 +1,5 @@
-#ifndef CUDA_DMFF_KERNELS_H_
-#define CUDA_DMFF_KERNELS_H_
-
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -31,6 +28,8 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE  *
  * USE OR OTHER DEALINGS IN THE SOFTWARE.                                     *
  * -------------------------------------------------------------------------- */
+#ifndef CUDA_DMFF_KERNELS_H_
+#define CUDA_DMFF_KERNELS_H_
 
 #include "DMFFKernels.h"
 #include "openmm/cuda/CudaContext.h"
@@ -56,8 +55,7 @@ private:
     OpenMM::CudaArray dmffForces;
     CUfunction addForcesKernel;
 
-    // graph_file 1 and 2 are used for alchemical simulation.
-    std::string graph_file, graph_file_1, graph_file_2;
+    std::string graph_file;
     cppflow::model jax_model;
     vector<int64_t> coord_shape = vector<int64_t>(2);
     vector<int64_t> box_shape{3, 3};
@@ -72,7 +70,7 @@ private:
     vector<std::set<int>> exclusions;
     
     int natoms;
-    int nghost = 0;
+    double cutoff;
     ENERGYTYPE dener;
     vector<FORCETYPE> dforce;
     vector<COORDTYPE> dcoord;

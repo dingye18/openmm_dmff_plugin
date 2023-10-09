@@ -76,4 +76,4 @@ IF (APPLE)
 ENDIF (APPLE)
 
 
-#SUBDIRS (tests)
+SUBDIRS (tests)

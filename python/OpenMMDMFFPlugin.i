@@ -45,26 +45,8 @@ namespace DMFFPlugin {
 class DMFFForce : public OpenMM::Force {
 public:
     DMFFForce(const string& GraphFile);
-    DMFFForce(const string& GraphFile, const string& GraphFile_1, const string& GraphFile_2);
 
-    void addParticle(const int particleIndex, const string particleType);
-    void addType(const int typeIndex, const string Type);
-    void addBond(const int particle1, const int particle2);
-    void setPBC(const bool use_pbc);
     void setUnitTransformCoefficients(const double coordCoefficient, const double forceCoefficient, const double energyCoefficient);
-
-    // Extract the model info from dp model.    
-    double getCutoff() const;
-    int getNumberTypes() const;
-    string getTypesMap() const;
-
-    /*
-    * Used for alchemical simulation. Not supported yet.
-    */
-    void setAlchemical(const bool used4Alchemical);
-    void setAtomsIndex4Graph1(const vector<int> atomsIndex);
-    void setAtomsIndex4Graph2(const vector<int> atomsIndex);
-    void setLambda(const double lambda);
 
     /*
      * Add methods for casting a Force to a DMFFForce.

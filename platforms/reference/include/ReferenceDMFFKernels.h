@@ -2,7 +2,7 @@
 #define REFERENCE_DMFF_KERNELS_H_
 
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -71,15 +71,15 @@ public:
      * @param force      the DMFFForce to copy the parameters from
      */
 private:
-    // graph_file 1 and 2 are used for alchemical simulation.
-    std::string graph_file, graph_file_1, graph_file_2;
-    // jax_m2 and jax_m3 are used for alchemical simulation.
+    std::string graph_file;
     cppflow::model jax_model;
+    
     std::vector<int64_t> coord_shape = vector<int64_t>(2); 
     std::vector<int64_t> coord_shape_1 = vector<int64_t>(2); 
     std::vector<int64_t> coord_shape_2 = vector<int64_t>(2);
     std::vector<int64_t> box_shape{3, 3};
     std::vector<int64_t> pair_shape = vector<int64_t>(2);
+    
     std::vector<cppflow::tensor> output;
     cppflow::tensor coord_tensor, box_tensor, pair_tensor;
     vector<std::string> operations;
@@ -89,6 +89,7 @@ private:
     std::vector<std::set<int>> exclusions;
 
     int natoms;
+    double cutoff;
     ENERGYTYPE dener;
     vector<FORCETYPE> dforce;
     vector<COORDTYPE> dcoord;

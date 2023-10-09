@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -49,12 +49,13 @@ void CudaCalcDMFFForceKernel::initialize(const System& system, const DMFFForce& 
     forceUnitCoeff = force.getForceUnitCoefficient();
     energyUnitCoeff = force.getEnergyUnitCoefficient();
     coordUnitCoeff = force.getCoordUnitCoefficient();
+    cutoff = force.getCutoff();
     
     natoms = system.getNumParticles();
     coord_shape[0] = natoms;
     coord_shape[1] = 3;
     exclusions.resize(natoms);
-   
+
     // Load the ordinary graph firstly.
     jax_model.init(graph_file);
 
@@ -130,7 +131,7 @@ double CudaCalcDMFFForceKernel::execute(ContextImpl& context, bool includeForces
         exclusions,
         box,
         true,
-        1.2,
+        cutoff,
         0.0
     );
     int totpairs = neighborList.size();

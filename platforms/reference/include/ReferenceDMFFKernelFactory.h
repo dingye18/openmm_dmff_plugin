@@ -2,7 +2,7 @@
 #define OPENMM_REFERENCEDMFFKERNELFACTORY_H_
 
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *

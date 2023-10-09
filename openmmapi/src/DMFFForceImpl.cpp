@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -60,10 +60,6 @@ double DMFFForceImpl::calcForcesAndEnergy(ContextImpl& context, bool includeForc
     if ((groups&(1<<owner.getForceGroup())) != 0)
         return kernel.getAs<CalcDMFFForceKernel>().execute(context, includeForces, includeEnergy);
     return 0.0;
-}
-
-vector<pair<int, int>> DMFFForceImpl::getBondedParticles() const{
-    return owner.getBondsList();
 }
 
 std::vector<std::string> DMFFForceImpl::getKernelNames() {

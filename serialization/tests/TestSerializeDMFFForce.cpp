@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                OpenMM                                      *
+ *                                OpenMM-DMFF                                 *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -45,14 +45,11 @@ extern "C" void registerDMFFSerializationProxies();
 
 void testSerialization() {
     const double TOL = 1e-5;
-    const string graph = "../tests/dmff_test_model/lj_fluid.pb";
-    const double coordUnitCoeff = 10;
-    const double forceUnitCoeff = 964.8792534459;
-    const double energyUnitCoeff = 96.48792534459;
+    const string graph = "../python/OpenMMDMFFPlugin/data/lj_fluid_gpu";
     const double temperature = 300;
 
     // Create a Force.
-    DMFFForce dmff_force = DMFFForce(graph, graph, graph);
+    DMFFForce dmff_force = DMFFForce(graph);
     
     stringstream buffer;
     XmlSerializer::serialize<DMFFForce>(&dmff_force, "Force", buffer);

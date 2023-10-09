@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -61,7 +61,6 @@ static Vec3* extractBoxVectors(ContextImpl& context) {
 }
 
 ReferenceCalcDMFFForceKernel::~ReferenceCalcDMFFForceKernel(){
-    //delete &jax_model;
     return;
 }
 
@@ -70,6 +69,7 @@ void ReferenceCalcDMFFForceKernel::initialize(const System& system, const DMFFFo
     forceUnitCoeff = force.getForceUnitCoefficient();
     energyUnitCoeff = force.getEnergyUnitCoefficient();
     coordUnitCoeff = force.getCoordUnitCoefficient();
+    cutoff = force.getCutoff();
 
     natoms = system.getNumParticles();
     coord_shape[0] = natoms;
@@ -142,7 +142,7 @@ double ReferenceCalcDMFFForceKernel::execute(ContextImpl& context, bool includeF
         exclusions,
         box, 
         true, 
-        1.2,
+        cutoff,
         0.0
     );
     int totpairs = neighborList.size();

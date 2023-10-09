@@ -2,38 +2,51 @@
 
 
 This is a plugin for [OpenMM](http://openmm.org) that used the trained JAX model by [DMFF](https://github.com/deepmodeling/DMFF) as an independent Force class for dynamics.
-To use it, you need to create a JAX graph with DMFF with the input are the atom coordinates, box size and neighbor list, and output the energy and forces.
+To use it, you need to save you DMFF model with the script in `DMFF/backend/save_dmff2tf.py`.
 
 ## Installation
 
-### Install from source
-To compile this plugin from source, three dependencies are required:
-* **OpenMM, v7.7**: Could be installed with `conda install -c conda-forge openmm cudatoolkit=11.6`.  
-* **[Tensorflow C API](https://www.tensorflow.org), v2.9.1**: Installed from source or download the pre-built binary from conda deepmodeling channel. Download from official website is not recommended since the issue of [C API in GPU XLA platform](https://github.com/tensorflow/tensorflow/issues/50458#issuecomment-1140817145).:
-   ```shell
-   # Compile from source.
-   wget https://raw.githubusercontent.com/deepmodeling/deepmd-kit/master/source/install/build_tf.py
-   python build_tf.py --cuda --cudnn-path {Path to cudnn installed dir} --prefix ${TENSORFLOW_LIB_INSTALLED_DIR}
-   cp -r ../packages/tensorflow/tensorflow-2.9.1/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
-   # Download from conda deepmodeling channel.
-   conda install -c deepmodeling libtensorflow_cc=2.9.0=cuda116h4bf587c_0
-   cp -r ${TENSORFLOW_SOURCE_DIR}/tensorflow/c ${TENSORFLOW_LIB_INSTALLED_DIR}/include/tensorflow
-   ```
-* **[cppflow](https://github.com/serizba/cppflow) header**: Since the class `cppflow::model` have no empty constructor. A small patch into the header file is required. 
-  ```shell
-  git clone https://github.com/serizba/cppflow.git
-  cd cppflow
-  git apply ${openmm_dmff_plugin_source_dir}/tests/cppflow_empty_constructor.patch
-  mkdir build && cd build
-  cmake .. -Dtensorflow_INCLUDE_DIRS=${LIBTENSORFLOW_INSTALLED_DIR}/include -Dtensorflow_LIBRARIES=${LIBTENSORFLOW_INSTALLED_DIR}/lib/libtensorflow.so
-  ```
+### Create environment with conda
+Install the python, openmm and cudatoolkit.
+```shell
 
-Compile plugin from source as following steps.
+mkdir omm_dmff_working_dir && cd omm_dmff_working_dir
+conda create -n dmff_omm -c conda-forge python=3.9 openmm cudatoolkit=11.6
+conda activate dmff_omm
+```
+### Download `libtensorflow_cc` and install `cppflow` package
+Install the precompiled libtensorflow_cc library from deepmodeling channel.
+```shell
 
-1. Clone this repository and create a directory in which to build the plugin.
+conda install -c deepmodeling libtensorflow_cc=2.9.1=cuda112h02da4e0_0
+```
+Download the tensorflow sources file. Copy the `c` direcotry in source code to installed header files of tensorflow library, since it's needed by package `cppflow`.
+```shell
+
+wget https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.9.1.tar.gz
+tar -xvf v2.9.1.tar.gz
+cp -r tensorflow-2.9.1/tensorflow/c ${CONDA_PREFIX}/include/tensorflow/
+```
+Download `cppflow` and move the headers library to environment path.
+```shell
+
+git clone https://github.com/serizba/cppflow.git
+cd cppflow
+git apply DMFF/backend/openmm_dmff_plugin/tests/cppflow_empty_constructor.patch
+mkdir ${CONDA_PREFIX}/include/cppflow
+cp -r include/cppflow ${CONDA_PREFIX}/include/
+```
+
+### Install the OpenMM DMFF plugin from source 
+
+Compile the plugin from source with following steps.
+1. Set up environment variables.
    ```shell
-   git clone https://github.com/dingye18/openmm_dmff_plugin.git
-   cd openmm_dmff_plugin && mkdir build && cd build
+   export OPENMM_INSTALLED_DIR=$CONDA_PREFIX
+   export CPPFLOW_INSTALLED_DIR=$CONDA_PREFIX
+   export LIBTENSORFLOW_INSTALLED_DIR=$CONDA_PREFIX
+   cd DMFF/backend/openmm_dmff_plugin/
+   mkdir build && cd build
    ```
 
 2. Run `cmake` command with required parameters.

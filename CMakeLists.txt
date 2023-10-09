@@ -28,8 +28,8 @@ SET (CMAKE_CXX_STANDARD 17)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-attributes -Wl,--allow-multiple-definition  -Wl,--no-as-needed")
 
-# Set if high precision (double) is used. By default, it is on.
-OPTION(USE_HIGH_PRECISION "Use high precision (double) for calculations" ON)
+# Set if high precision (double) is used. By default, it is off.
+OPTION(USE_HIGH_PRECISION "Use high precision (double) for calculations" OFF)
 
 IF(USE_HIGH_PRECISION)
     message(STATUS "USE_HIGH_PRECISION is enabled")

@@ -2,7 +2,7 @@
 #define OPENMM_DMFFFORCEIMPL_H_
 
 /* -------------------------------------------------------------------------- *
- *                                   OpenMM                                   *
+ *                                   OpenMM-DMFF                              *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -62,8 +62,7 @@ public:
     std::map<std::string, double> getDefaultParameters() {
         return std::map<std::string, double>(); // This force field doesn't define any parameters.
     }
-    std::vector<std::string> getKernelNames();
-    vector<pair<int, int>> getBondedParticles() const; 
+    std::vector<std::string> getKernelNames(); 
     //void updateParametersInContext(OpenMM::ContextImpl& context);
 private:
     const DMFFForce& owner;

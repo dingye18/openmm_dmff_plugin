@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- *
- *                                OpenMM                                      *
+ *                                OpenMM-DMFF                                 *
  * -------------------------------------------------------------------------- *
  * This is part of the OpenMM molecular simulation toolkit originating from   *
  * Simbios, the NIH National Center for Physics-Based Simulation of           *
@@ -47,13 +47,11 @@ void DMFFForceProxy::serialize(const void* object, SerializationNode& node) cons
     node.setIntProperty("version", 0);
     const DMFFForce& force = *reinterpret_cast<const DMFFForce*>(object);
     node.setStringProperty("file", force.getDMFFGraphFile());
-    node.setStringProperty("file1", force.getGraph1_4Alchemical());
-    node.setStringProperty("file2", force.getGraph2_4Alchemical());
 }
 
 void* DMFFForceProxy::deserialize(const SerializationNode& node) const {
     if (node.getIntProperty("version") != 0)
         throw OpenMMException("Unsupported version number");
-    DMFFForce* force = new DMFFForce(node.getStringProperty("file"), node.getStringProperty("file1"), node.getStringProperty("file2"));
+    DMFFForce* force = new DMFFForce(node.getStringProperty("file"));
     return force;
 }
